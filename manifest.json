@@ -1,0 +1,19 @@
+
+{
+  "short_name": "Workoutron",
+  "name": "Workoutron 3000 - Smart Workout Generator",
+  "icons": [
+    {
+      "src": "https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1a73e8",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "description": "Generate workouts from any gym equipment using AI."
+}
