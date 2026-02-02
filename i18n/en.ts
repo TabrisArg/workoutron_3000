@@ -2,9 +2,9 @@ import { TranslationSchema } from './types';
 
 export const en: TranslationSchema = {
   common: {
-    appName: "Workoutron",
-    appVersion: "3000",
-    fullVersion: "3.1.0-PREVIEW",
+    appName: "VizoFit",
+    appVersion: "1.0.0",
+    fullVersion: "1.0.0-PRO",
     back: "Back",
     cancel: "Cancel",
     confirm: "Confirm",

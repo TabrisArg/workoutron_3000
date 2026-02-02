@@ -8,11 +8,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="manifest" href="manifest.json" />
-    <title>Workoutron - Clean AI Training</title>
+    <title>VizoFit - AI Gym Intelligence</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Baloo+Chettan+2:wght@600;700;800&display=swap"
         rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
@@ -20,15 +21,17 @@
             theme: {
                 extend: {
                     colors: {
-                        "apple-blue": "#007AFF",
-                        "apple-gray": "#8E8E93",
-                        "apple-bg": "#F2F2F7",
+                        "apple-blue": "#245160",
+                        "apple-gray": "#757C84",
+                        "apple-bg": "#EBEAEA",
                         "apple-secondary": "#FFFFFF",
                         "apple-text": "#1D1D1F",
-                        "apple-label": "#3A3A3C",
+                        "apple-label": "#747484",
+                        "vizofit-accent": "#0cf4e3",
                     },
                     fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        brand: ['Baloo Chettan 2', 'cursive'],
                     },
                     borderRadius: {
                         'ios': '1.25rem',
@@ -99,6 +102,10 @@
                 @apply bg-apple-bg text-apple-text font-sans antialiased dark:bg-[#000000] dark:text-white;
                 min-height: 100dvh;
             }
+            h1, h2, h3, h4, .font-brand {
+                font-family: 'Baloo Chettan 2', cursive;
+                font-weight: 700;
+            }
         }
         .glass-card {
             @apply bg-white/40 backdrop-blur-[40px] border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] dark:bg-black/40 dark:border-white/10;
@@ -143,7 +150,7 @@
         .vfx-glow-border::after {
             content: '';
             @apply absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300;
-            box-shadow: 0 0 15px theme('colors.apple-blue');
+            box-shadow: 0 0 15px #245160;
         }
         .vfx-glow-border:hover::after {
             @apply opacity-20;

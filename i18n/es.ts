@@ -3,9 +3,9 @@ import { TranslationSchema } from './types';
 
 export const es: TranslationSchema = {
   common: {
-    appName: "Workoutron",
-    appVersion: "3000",
-    fullVersion: "3.1.0-PREVIEW",
+    appName: "VizoFit",
+    appVersion: "1.0.0",
+    fullVersion: "1.0.0-PRO",
     back: "Atrás",
     cancel: "Cancelar",
     confirm: "Confirmar",
@@ -49,7 +49,7 @@ export const es: TranslationSchema = {
     legalDisclaimerBtn: "Términos y Descargo Legal",
     legalModalTitle: "Descargo de Responsabilidad Legal",
     legalBody: [
-      "Las rutinas y ejercicios generados por Workoutron 3000 son proporcionados por inteligencia artificial solo con fines informativos.",
+      "Las rutinas y ejercicios generados por VizoFit son proporcionados por inteligencia artificial solo con fines informativos.",
       "Advertencia: Consulta siempre con un profesional del fitness o médico antes de comenzar cualquier programa de ejercicios."
     ],
     legalUnderstand: "Entiendo",
@@ -75,7 +75,7 @@ export const es: TranslationSchema = {
     snapchat: "Snapchat",
     copyLink: "Copiar Enlace",
     linkCopied: "¡Enlace Copiado!",
-    generatedBy: "Descarga Workoutron en Google Play o Apple App Store"
+    generatedBy: "Descarga VizoFit en Google Play o Apple App Store"
   },
   library: {
     title: "Tu Biblioteca",
@@ -97,7 +97,7 @@ export const es: TranslationSchema = {
     recentProgress: "Progreso Reciente",
     lastSessions: "Últimas 10 sesiones",
     noActivity: "Aún no hay actividad. ¡Empieza escaneando equipo!",
-    months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dic"],
+    months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
     scores: {
       none: "Ninguno",
       elite: "Élite",

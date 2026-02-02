@@ -3,15 +3,18 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { WorkoutRoutine } from "../types";
 
 export const analyzeEquipment = async (
-  base64Image: string, 
+  base64Image: string,
   preferredUnits: 'metric' | 'imperial' = 'metric',
   language: 'en' | 'es' | 'fr' | 'de' | 'pt' | 'ru' | 'hi' | 'ar' = 'en'
 ): Promise<WorkoutRoutine> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const modelName = 'gemini-3-flash-preview';
-  
-  const unitInstructions = preferredUnits === 'imperial' 
-    ? "Use Imperial units (lbs, miles)." 
+  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("API Key configuration missing. Check your environment variables.");
+
+  const ai = new GoogleGenAI({ apiKey, apiVersion: 'v1beta' });
+  const modelName = 'gemini-2.5-flash';
+
+  const unitInstructions = preferredUnits === 'imperial'
+    ? "Use Imperial units (lbs, miles)."
     : "Use Metric units (kg, km).";
 
   const langMap: Record<string, string> = {
@@ -42,12 +45,13 @@ export const analyzeEquipment = async (
   try {
     const response = await ai.models.generateContent({
       model: modelName,
-      contents: {
+      contents: [{
+        role: 'user',
         parts: [
           { inlineData: { data: base64Image, mimeType: "image/jpeg" } },
           { text: prompt }
         ]
-      },
+      }],
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -77,19 +81,26 @@ export const analyzeEquipment = async (
             safetyTips: { type: Type.ARRAY, items: { type: Type.STRING } },
             estimatedDuration: { type: Type.STRING }
           },
-          required: ["equipmentName", "exercises", "targetMuscles", "suggestedIntensity"]
+          required: ["equipmentName", "exercises", "targetMuscles", "suggestedIntensity", "safetyTips", "estimatedDuration"]
         }
       }
     });
 
     const text = response.text;
-    if (!text) throw new Error("No response from AI.");
-    
+    if (!text) {
+      console.error("AI Response Missing Text. Full Response:", JSON.stringify(response));
+      throw new Error("AI returned an empty response. Please try a different photo.");
+    }
+
     const result = JSON.parse(text) as WorkoutRoutine;
     result.generatedLanguage = language;
     return result;
   } catch (error: any) {
-    console.error("AI Analysis Error:", error);
-    throw new Error("Analysis failed. Please try a clearer photo.");
+    console.error("AI Analysis Detailed Error:", error);
+    // Log the actual error message to console to help debugging
+    if (error.message) console.error("Error Message:", error.message);
+    if (error.stack) console.error("Error Stack:", error.stack);
+
+    throw new Error(`Analysis failed: ${error.message || "Please try a clearer photo."}`);
   }
 };

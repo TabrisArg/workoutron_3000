@@ -14,22 +14,26 @@ const MonthGrid: React.FC<MonthProps> = ({ year, monthIndex, logs, t }) => {
   const monthNames = t.activity.months;
   const daysInMonth = useMemo(() => new Date(year, monthIndex + 1, 0).getDate(), [year, monthIndex]);
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  
+
   const getLogsForDay = (day: number) => {
-    const dateStr = new Date(year, monthIndex, day).toISOString().split('T')[0];
+    // Generate local YYYY-MM-DD string to match log.date (which is also formatted locally in App.tsx)
+    const y = year;
+    const m = String(monthIndex + 1).padStart(2, '0');
+    const d = String(day).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
     return logs.filter(log => log.date.split('T')[0] === dateStr);
   };
 
   const getColorClass = (count: number) => {
     if (count === 0) return 'bg-apple-bg dark:bg-white/10';
-    if (count === 1) return 'bg-apple-blue/30';
-    if (count === 2) return 'bg-apple-blue/60';
-    return 'bg-apple-blue';
+    if (count === 1) return 'bg-vizofit-accent/30';
+    if (count === 2) return 'bg-vizofit-accent/60';
+    return 'bg-vizofit-accent';
   };
 
   return (
     <div className="flex flex-col space-y-2 shrink-0">
-      <span className="text-[10px] font-black text-apple-gray dark:text-apple-gray uppercase tracking-widest ps-0.5 border-s-2 border-apple-blue/20 ms-0.5">
+      <span className="text-[10px] font-black text-apple-gray dark:text-apple-gray uppercase tracking-widest ps-0.5 border-s-2 border-vizofit-accent/20 ms-0.5">
         {monthNames[monthIndex]}
       </span>
       <div className="grid grid-cols-7 gap-1">
@@ -39,7 +43,7 @@ const MonthGrid: React.FC<MonthProps> = ({ year, monthIndex, logs, t }) => {
           return (
             <div
               key={day}
-              onMouseEnter={() => { if(count > 0) soundService.playTick(); }}
+              onMouseEnter={() => { if (count > 0) soundService.playTick(); }}
               className={`size-3 sm:size-3.5 rounded-sm ios-transition ${getColorClass(count)} hover:scale-125 hover:z-10 shadow-sm`}
             />
           );
@@ -56,20 +60,20 @@ interface ActivityCalendarProps {
 const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ t }) => {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const currentYear = useMemo(() => new Date().getFullYear(), []);
-  
+
   useEffect(() => {
     // 1. Load logs
-    const raw = localStorage.getItem('equipfit_activity_logs');
+    const raw = localStorage.getItem('vizofit_activity');
     let currentLogs: ActivityLog[] = raw ? JSON.parse(raw) : [];
 
     // 2. Resource Management: Prune old history if it gets too large (>200 items)
     // We only prune un-favorited routines from the library side, 
     // but here we just keep the last 300 logs to keep memory low.
     if (currentLogs.length > 300) {
-       currentLogs = currentLogs.slice(0, 300);
-       localStorage.setItem('equipfit_activity_logs', JSON.stringify(currentLogs));
+      currentLogs = currentLogs.slice(0, 300);
+      localStorage.setItem('vizofit_activity', JSON.stringify(currentLogs));
     }
-    
+
     setLogs(currentLogs);
   }, []);
 
@@ -106,14 +110,12 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ t }) => {
         <p className="text-apple-gray dark:text-apple-gray font-bold text-sm tracking-tight">{t.activity.descPrefix} {currentYear}</p>
       </div>
 
-      <div className="bg-white dark:bg-[#1C1C1E] p-6 md:p-8 rounded-[2rem] shadow-ios border border-black/5 dark:border-white/10 w-full overflow-hidden">
+      <div className="bg-white dark:bg-[#1C1C1E] p-6 md:p-8 rounded-[2rem] shadow-ios border border-black/5 dark:border-white/10 w-full">
         <div className="flex flex-col space-y-8">
-          <div className="overflow-x-auto no-scrollbar pb-4 -mx-2 px-2">
-            <div className="flex gap-1 min-w-max">
-              {Array.from({ length: 12 }, (_, i) => (
-                <MonthGrid key={i} year={currentYear} monthIndex={i} logs={logs} t={t} />
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-x-1 gap-y-10 justify-center md:justify-start">
+            {t.activity.months.map((_, i) => (
+              <MonthGrid key={i} year={currentYear} monthIndex={i} logs={logs} t={t} />
+            ))}
           </div>
           <div className="flex flex-col md:flex-row md:items-center justify-between pt-8 border-t border-apple-bg dark:border-white/10 gap-6">
             <div className="flex items-center gap-8">
@@ -124,8 +126,8 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ t }) => {
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-apple-gray uppercase tracking-widest mb-1">{t.activity.currentStreak}</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black tracking-tighter text-apple-blue">{streak}</span>
-                  <span className="text-xs font-black text-apple-blue uppercase">{t.activity.days}</span>
+                  <span className="text-3xl font-black tracking-tighter text-vizofit-accent">{streak}</span>
+                  <span className="text-xs font-black text-vizofit-accent uppercase">{t.activity.days}</span>
                 </div>
               </div>
               <div className="hidden sm:flex flex-col">

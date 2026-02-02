@@ -13,12 +13,12 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    const raw = localStorage.getItem('equipfit_saved');
+    const raw = localStorage.getItem('vizofit_library');
     if (raw) setSaved(JSON.parse(raw));
   }, []);
 
   const saveToStorage = (updated: SavedWorkout[]) => {
-    localStorage.setItem('equipfit_saved', JSON.stringify(updated));
+    localStorage.setItem('vizofit_library', JSON.stringify(updated));
     setSaved(updated);
   };
 
@@ -51,20 +51,20 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
   };
 
   const sortedAndFiltered = useMemo(() => {
-    const filtered = saved.filter(s => 
+    const filtered = saved.filter(s =>
       s.routine.equipmentName.toLowerCase().includes(search.toLowerCase())
     );
 
     return filtered.sort((a, b) => {
       if (a.isFavorited && !b.isFavorited) return -1;
       if (!a.isFavorited && b.isFavorited) return 1;
-      
+
       if (a.isFavorited && b.isFavorited) {
         const dateA = a.favoritedAt ? new Date(a.favoritedAt).getTime() : 0;
         const dateB = b.favoritedAt ? new Date(b.favoritedAt).getTime() : 0;
         return dateB - dateA;
       }
-      
+
       return b.id.localeCompare(a.id);
     });
   }, [saved, search]);
@@ -86,11 +86,11 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
       <div className="space-y-4 animate-reveal max-w-2xl">
         <h2 className="text-4xl font-black tracking-tight dark:text-white">{t.library.title}</h2>
         <div className="relative group">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-rounded text-apple-gray text-2xl group-focus-within:text-apple-blue transition-colors z-10">search</span>
-          <input 
-            className="w-full pl-12 pr-4 py-4 bg-white dark:bg-[#1C1C1E] dark:text-white rounded-ios border-none shadow-sm focus:ring-4 focus:ring-apple-blue/10 text-lg font-medium placeholder:text-apple-gray/50 ios-transition relative" 
-            placeholder={t.library.searchPlaceholder} 
-            type="text" 
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-rounded text-apple-gray text-2xl group-focus-within:text-vizofit-accent transition-colors z-10">search</span>
+          <input
+            className="w-full pl-12 pr-4 py-4 bg-white dark:bg-[#1C1C1E] dark:text-white rounded-ios border-none shadow-sm focus:ring-4 focus:ring-vizofit-accent/10 text-lg font-medium placeholder:text-apple-gray/50 ios-transition relative"
+            placeholder={t.library.searchPlaceholder}
+            type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -99,16 +99,16 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {sortedAndFiltered.map((workout, i) => (
-          <div 
+          <div
             key={workout.id}
             onClick={() => onSelect(workout)}
             className={`group relative bg-white dark:bg-[#1C1C1E] rounded-ios-lg overflow-hidden shadow-sm hover:shadow-ios-card hover:-translate-y-0.5 ios-transition cursor-pointer border border-black/5 dark:border-white/10 animate-reveal stagger-${(i % 5) + 1} vfx-glow-border`}
           >
             <div className="relative aspect-square bg-apple-bg dark:bg-[#2C2C2E] overflow-hidden">
               {workout.imagePreview ? (
-                <img 
-                  src={workout.imagePreview} 
-                  className="w-full h-full object-cover group-hover:scale-110 ios-transition duration-500" 
+                <img
+                  src={workout.imagePreview}
+                  className="w-full h-full object-cover group-hover:scale-110 ios-transition duration-500"
                   alt={workout.routine.equipmentName}
                 />
               ) : (
@@ -116,10 +116,10 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
                   <span className="material-symbols-rounded text-5xl text-apple-gray/20">fitness_center</span>
                 </div>
               )}
-              
-              <button 
+
+              <button
                 onClick={(e) => toggleFavorite(workout.id, e)}
-                className={`absolute top-3 left-3 size-11 rounded-full flex items-center justify-center shadow-2xl border-2 z-20 transition-all duration-300 ${workout.isFavorited ? 'bg-yellow-400 text-white border-yellow-200 scale-105' : 'bg-white/90 dark:bg-black/60 backdrop-blur-md text-apple-text dark:text-white border-apple-blue/10 hover:bg-yellow-400 hover:text-white dark:border-white/10'}`}
+                className={`absolute top-3 left-3 size-11 rounded-full flex items-center justify-center shadow-2xl border-2 z-20 transition-all duration-300 ${workout.isFavorited ? 'bg-yellow-400 text-white border-yellow-200 scale-105' : 'bg-white/90 dark:bg-black/60 backdrop-blur-md text-apple-text dark:text-white border-vizofit-accent/10 hover:bg-yellow-400 hover:text-white dark:border-white/10'}`}
                 title={workout.isFavorited ? t.library.favRemove : t.library.favAdd}
               >
                 <span className={`material-symbols-rounded text-[22px] leading-none ${workout.isFavorited ? 'fill-1 drop-shadow-md' : ''}`} style={{ fontVariationSettings: `'FILL' ${workout.isFavorited ? 1 : 0}` }}>
@@ -127,7 +127,7 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
                 </span>
               </button>
 
-              <button 
+              <button
                 onClick={(e) => deleteWorkout(workout.id, e)}
                 className="absolute top-3 right-3 size-11 bg-white/90 dark:bg-black/60 backdrop-blur-md text-apple-text dark:text-white rounded-full flex items-center justify-center shadow-2xl border-2 border-red-500/10 dark:border-white/10 hover:bg-red-500 hover:text-white hover:scale-110 active:scale-90 z-20 transition-all duration-200"
                 title={t.library.removeTitle}
@@ -137,10 +137,10 @@ const SavedWorkouts: React.FC<SavedWorkoutsProps> = ({ onSelect, t }) => {
 
               <div className="absolute inset-0 bg-black/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
             </div>
-            
+
             <div className="p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-apple-blue uppercase opacity-80">{workout.date}</span>
+                <span className="text-[10px] font-black text-vizofit-accent uppercase opacity-80">{workout.date}</span>
                 {workout.isFavorited && (
                   <span className="material-symbols-rounded text-yellow-500 text-sm fill-1">star</span>
                 )}

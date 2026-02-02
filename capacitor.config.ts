@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.workoutron.app',
-  appName: 'Workoutron3000',
+  appId: 'com.vizofit.app',
+  appName: 'VizoFit',
   webDir: 'dist'
 };
 

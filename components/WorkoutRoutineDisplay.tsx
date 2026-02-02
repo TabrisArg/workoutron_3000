@@ -5,6 +5,7 @@ import { compressBase64 } from '../utils/imageUtils';
 import { soundService } from '../utils/soundService';
 import { TranslationSchema } from '../i18n/types';
 import ShareStudio from './ShareStudio';
+import { isSimilarName } from '../utils/stringUtils';
 
 interface ExerciseWithId extends Exercise {
   id: string;
@@ -19,7 +20,7 @@ interface WorkoutRoutineDisplayProps {
   onReset: () => void;
   onComplete: (routine: WorkoutRoutine, savedId: string | null) => void;
   onUpgrade: () => void; // NEW: Callback for upgrade prompt
-  onDuplicateDetected: (match: SavedWorkout, onResolve: (mode: 'new' | 'overwrite') => void) => void;
+  onDuplicateDetected: (routine: WorkoutRoutine, image: string | null) => void;
 }
 
 const CONV = { KG_TO_LB: 2.20462, M_TO_YD: 1.09361, KM_TO_MI: 0.621371 };
@@ -82,11 +83,11 @@ const parseTimeSeconds = (str: string | undefined): number | null => {
 };
 
 const INTENSITY_LEVELS = [
-  { id: 1, mult: 0.5, color: '#BAE6FD', label: 'LITE', isPremium: false },
-  { id: 2, mult: 0.75, color: '#7DD3FC', label: 'LOW', isPremium: false },
-  { id: 3, mult: 1.0, color: '#007AFF', label: 'MID', isPremium: false },
-  { id: 4, mult: 1.25, color: '#1D4ED8', label: 'HIGH', isPremium: false },
-  { id: 5, mult: 1.5, color: '#1E3A8A', label: 'MAX', isPremium: false }
+  { id: 1, mult: 0.5, color: '#0cf4e3', label: 'LITE', isPremium: false },
+  { id: 2, mult: 0.75, color: '#757C84', label: 'LOW', isPremium: false },
+  { id: 3, mult: 1.0, color: '#245160', label: 'MID', isPremium: false },
+  { id: 4, mult: 1.25, color: '#1A3A45', label: 'HIGH', isPremium: false },
+  { id: 5, mult: 1.5, color: '#0F2228', label: 'MAX', isPremium: false }
 ];
 
 const ActiveTrainingOverlay: React.FC<{
@@ -166,11 +167,11 @@ const ActiveTrainingOverlay: React.FC<{
 
   if (status === 'finished') {
     return (
-      <div className="fixed inset-0 z-[200] bg-apple-blue flex flex-col items-center justify-center p-10 text-white animate-reveal">
+      <div className="fixed inset-0 z-[200] bg-vizofit-accent flex flex-col items-center justify-center p-10 text-apple-text animate-reveal">
         <span className="material-symbols-rounded text-[120px] mb-6 animate-spring">celebration</span>
         <h2 className="text-4xl font-black tracking-tighter mb-2">{t.workout.complete}</h2>
         <p className="text-white/80 font-bold mb-10">You crushed it!</p>
-        <button onClick={onClose} className="bg-white text-apple-blue px-12 py-4 rounded-2xl font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-transform">
+        <button onClick={onClose} className="bg-white text-apple-text px-12 py-4 rounded-2xl font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-transform">
           {t.common.done}
         </button>
       </div>
@@ -184,7 +185,7 @@ const ActiveTrainingOverlay: React.FC<{
   return (
     <div className="fixed inset-0 z-[200] bg-white dark:bg-[#000000] flex flex-col animate-reveal">
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-apple-bg dark:bg-white/10">
-        <div className="h-full bg-apple-blue transition-all duration-500" style={{ width: `${progress}%` }}></div>
+        <div className="h-full bg-vizofit-accent transition-all duration-500" style={{ width: `${progress}%` }}></div>
       </div>
       <header className="p-6 flex justify-between items-center shrink-0">
         <button onClick={onClose} className="size-10 rounded-full bg-apple-bg dark:bg-white/10 flex items-center justify-center text-apple-text dark:text-white">
@@ -198,7 +199,7 @@ const ActiveTrainingOverlay: React.FC<{
       </header>
       <main className="flex-grow flex flex-col items-center px-8 text-center overflow-y-auto no-scrollbar">
         <div className="mb-8 mt-4 space-y-2 shrink-0">
-          <span className="text-apple-blue font-black text-xs uppercase tracking-widest">Set {currentSet} of {totalSets}</span>
+          <span className="text-vizofit-accent font-black text-xs uppercase tracking-widest">Set {currentSet} of {totalSets}</span>
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter dark:text-white leading-tight break-words max-w-lg mx-auto uppercase">{currentExercise.name}</h2>
         </div>
         <div className="w-full max-sm mx-auto space-y-4 mb-8 shrink-0">
@@ -208,7 +209,7 @@ const ActiveTrainingOverlay: React.FC<{
                 {t.workout.doneWithSet}
               </button>
             ) : (
-              <button onClick={skipTimer} className="w-full bg-apple-blue text-white py-5 rounded-2xl font-black text-xl shadow-xl active:scale-95 ios-transition uppercase tracking-widest">
+              <button onClick={skipTimer} className="w-full bg-vizofit-accent text-apple-text py-5 rounded-2xl font-black text-xl shadow-xl active:scale-95 ios-transition uppercase tracking-widest">
                 {status === 'resting' ? t.workout.skip : t.workout.skip}
               </button>
             )}
@@ -227,7 +228,7 @@ const ActiveTrainingOverlay: React.FC<{
         <div className="relative size-60 md:size-72 flex items-center justify-center mb-10 shrink-0">
           <div className="absolute inset-0 rounded-full border-8 border-apple-bg dark:border-white/5"></div>
           <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r={radius} fill="none" stroke="currentColor" strokeWidth="6" className={`text-apple-blue transition-all duration-1000 ${status === 'resting' ? 'text-orange-400' : ''}`} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" />
+            <circle cx="50" cy="50" r={radius} fill="none" stroke="currentColor" strokeWidth="6" className={`text-vizofit-accent transition-all duration-1000 ${status === 'resting' ? 'text-orange-400' : ''}`} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" />
           </svg>
           <div className="flex flex-col items-center animate-pulse-soft">
             {timeLeft > 0 ? (
@@ -259,7 +260,7 @@ const IntensityGauge: React.FC<{ activeId: number, isPro: boolean, onChange: (id
         <div className="absolute inset-0 flex px-1">
           {INTENSITY_LEVELS.map(level => (
             <button key={level.id} onClick={() => onChange(level.id)} className="flex-1 h-full cursor-pointer z-20 outline-none flex items-center justify-center relative">
-              <span className={`text-[8px] font-black uppercase tracking-tighter transition-opacity duration-300 ${level.id === activeId ? 'opacity-0' : 'opacity-30 dark:text-white'}`}>{level.label}</span>
+              <span className={`text-[8px] font-black uppercase tracking-tighter transition-opacity duration-300 ${level.id === activeId ? 'opacity-0' : 'opacity-60 dark:text-white'}`}>{level.label}</span>
             </button>
           ))}
         </div>
@@ -305,7 +306,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
   useEffect(() => {
     if (initialSavedId && initialSavedId !== sessionSavedId) setSessionSavedId(initialSavedId);
     if (initialSavedId) {
-      const saved = JSON.parse(localStorage.getItem('equipfit_saved') || '[]');
+      const saved = JSON.parse(localStorage.getItem('vizofit_library') || '[]');
       const current = saved.find((s: SavedWorkout) => s.id === initialSavedId);
       if (current) setIsFavorited(!!current.isFavorited);
     }
@@ -321,12 +322,12 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
 
   const persistToLibrary = (updatedRoutine: any, favStatus?: boolean) => {
     if (!sessionSavedId) return;
-    const saved = JSON.parse(localStorage.getItem('equipfit_saved') || '[]');
+    const saved = JSON.parse(localStorage.getItem('vizofit_library') || '[]');
     const index = saved.findIndex((s: SavedWorkout) => s.id === sessionSavedId);
     if (index !== -1) {
       const updatedFav = favStatus !== undefined ? favStatus : saved[index].isFavorited;
       saved[index] = { ...saved[index], routine: JSON.parse(JSON.stringify(updatedRoutine)), isFavorited: updatedFav };
-      localStorage.setItem('equipfit_saved', JSON.stringify(saved));
+      localStorage.setItem('vizofit_library', JSON.stringify(saved));
     }
   };
 
@@ -373,23 +374,31 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
   const handleSaveClick = () => {
     if (sessionSavedId) {
       soundService.playSad();
-      const existing = JSON.parse(localStorage.getItem('equipfit_saved') || '[]');
+      const existing = JSON.parse(localStorage.getItem('vizofit_library') || '[]');
       const updated = existing.filter((s: SavedWorkout) => s.id !== sessionSavedId);
-      localStorage.setItem('equipfit_saved', JSON.stringify(updated));
+      localStorage.setItem('vizofit_library', JSON.stringify(updated));
       setSessionSavedId(null);
       setIsFavorited(false);
     } else {
-      soundService.playTriumphant();
-      performSave();
+      const library = JSON.parse(localStorage.getItem('vizofit_library') || '[]');
+      const duplicate = library.find((s: SavedWorkout) => isSimilarName(s.routine.equipmentName, currentRoutine.equipmentName));
+
+      if (duplicate) {
+        soundService.playTick();
+        onDuplicateDetected(currentRoutine as unknown as WorkoutRoutine, imagePreview);
+      } else {
+        soundService.playTriumphant();
+        performSave();
+      }
     }
   };
 
   const performSave = async () => {
-    const library = JSON.parse(localStorage.getItem('equipfit_saved') || '[]');
+    const library = JSON.parse(localStorage.getItem('vizofit_library') || '[]');
     const targetId = Date.now().toString();
     const compressedImg = imagePreview ? await compressBase64(imagePreview) : null;
     const newSaved: SavedWorkout = { id: targetId, date: new Date().toLocaleDateString(), routine: JSON.parse(JSON.stringify(currentRoutine)) as WorkoutRoutine, imagePreview: compressedImg, isFavorited: false };
-    localStorage.setItem('equipfit_saved', JSON.stringify([newSaved, ...library]));
+    localStorage.setItem('vizofit_library', JSON.stringify([newSaved, ...library]));
     setSessionSavedId(targetId);
   };
 
@@ -397,8 +406,8 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
     soundService.playWorkoutComplete();
     onComplete(currentRoutine as unknown as WorkoutRoutine, sessionSavedId);
     const log = { id: Date.now().toString(), date: new Date().toISOString(), equipmentName: currentRoutine.equipmentName, duration: currentRoutine.estimatedDuration };
-    const logs = JSON.parse(localStorage.getItem('equipfit_activity_logs') || '[]');
-    localStorage.setItem('equipfit_activity_logs', JSON.stringify([log, ...logs]));
+    const logs = JSON.parse(localStorage.getItem('vizofit_activity') || '[]');
+    localStorage.setItem('vizofit_activity', JSON.stringify([log, ...logs]));
     setIsActiveMode(false);
   };
 
@@ -426,8 +435,11 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
             <div className="space-y-1 overflow-hidden w-full">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{t.workout.identified}</span>
-                <div className="size-1 bg-apple-blue rounded-full"></div>
-                <span className="text-[10px] font-black text-apple-blue uppercase tracking-widest">{currentRoutine.suggestedIntensity || 'Moderate'}</span>
+                <div className="size-1 bg-vizofit-accent rounded-full"></div>
+                <div className="flex items-center gap-2 bg-vizofit-accent/30 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20 shadow-sm ml-1">
+                  <div className="size-1.5 bg-vizofit-accent rounded-full animate-pulse shadow-[0_0_8px_rgba(12,244,227,0.6)]"></div>
+                  <span className="text-[9px] font-black text-white uppercase tracking-widest drop-shadow-md">{currentRoutine.suggestedIntensity || 'Moderate'}</span>
+                </div>
                 {isLanguageMismatch && (
                   <div className="flex items-center gap-1.5 ms-1 bg-orange-500/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-orange-500/30">
                     <span className="material-symbols-rounded text-[10px] text-orange-400 font-black">translate</span>
@@ -436,7 +448,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                 )}
               </div>
               {isEditing ? (
-                <input type="text" value={baselineRoutine.equipmentName} onChange={(e) => updateEquipmentName(e.target.value)} className="w-full bg-black/40 backdrop-blur-md border-2 border-white/20 rounded-2xl px-5 py-3 text-2xl md:text-4xl font-black text-white focus:outline-none focus:border-apple-blue/50 focus:ring-4 focus:ring-apple-blue/10 ios-transition shadow-2xl" />
+                <input type="text" value={baselineRoutine.equipmentName} onChange={(e) => updateEquipmentName(e.target.value)} className="w-full bg-black/40 backdrop-blur-md border-2 border-white/20 rounded-2xl px-5 py-3 text-2xl md:text-4xl font-black text-white focus:outline-none focus:border-vizofit-accent/50 focus:ring-4 focus:ring-vizofit-accent/10 ios-transition shadow-2xl" />
               ) : (
                 <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-none break-words drop-shadow-lg uppercase">{currentRoutine.equipmentName}</h2>
               )}
@@ -461,19 +473,19 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
 
           <div className="space-y-4 relative">
             {currentRoutine.exercises.map((ex, idx) => (
-              <div key={ex.id} onPointerEnter={() => handlePointerEnterCard(idx)} className={`bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-ios border border-black/5 dark:border-white/10 flex flex-col md:flex-row gap-6 relative group overflow-hidden transition-all duration-300 ease-out ${draggedIdx === idx ? 'opacity-30 scale-[0.97] border-apple-blue/50 shadow-none z-0' : 'opacity-100 z-10'}`}>
+              <div key={ex.id} onPointerEnter={() => handlePointerEnterCard(idx)} className={`bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-ios border border-black/5 dark:border-white/10 flex flex-col md:flex-row gap-6 relative group overflow-hidden transition-all duration-300 ease-out ${draggedIdx === idx ? 'opacity-30 scale-[0.97] border-vizofit-accent/50 shadow-none z-0' : 'opacity-100 z-10'}`}>
                 {isEditing && (
-                  <div onPointerDown={() => handlePointerDown(idx)} className="absolute inset-s-0 top-0 bottom-0 w-12 bg-black/[0.03] dark:bg-white/[0.03] flex items-center justify-center border-e border-black/[0.05] dark:border-white/[0.05] cursor-grab active:cursor-grabbing hover:bg-apple-blue/5 transition-colors z-30">
-                    <span className="material-symbols-rounded text-apple-gray group-hover:text-apple-blue transition-colors pointer-events-none select-none">drag_indicator</span>
+                  <div onPointerDown={() => handlePointerDown(idx)} className="absolute inset-s-0 top-0 bottom-0 w-12 bg-black/[0.03] dark:bg-white/[0.03] flex items-center justify-center border-e border-black/[0.05] dark:border-white/[0.05] cursor-grab active:cursor-grabbing hover:bg-vizofit-accent/5 transition-colors z-30">
+                    <span className="material-symbols-rounded text-apple-gray group-hover:text-vizofit-accent transition-colors pointer-events-none select-none">drag_indicator</span>
                   </div>
                 )}
                 <div className={`flex-grow space-y-4 overflow-hidden ${isEditing ? 'ps-10' : ''}`}>
                   <div className="flex items-start justify-between">
                     <div className="space-y-1 w-full">
                       <div className="flex items-center gap-3">
-                        <span className="size-6 rounded-full bg-apple-blue text-white text-[10px] font-black flex items-center justify-center shrink-0">{idx + 1}</span>
+                        <span className="size-6 rounded-full bg-vizofit-accent text-apple-text text-[10px] font-black flex items-center justify-center shrink-0">{idx + 1}</span>
                         {isEditing ? (
-                          <input type="text" value={ex.name} onChange={(e) => updateExercise(idx, 'name', e.target.value)} className="w-full bg-apple-bg dark:bg-[#2C2C2E] border-2 border-black/[0.05] dark:border-white/10 rounded-2xl px-4 py-2 text-lg font-black dark:text-white focus:outline-none focus:border-apple-blue/50 focus:ring-4 focus:ring-apple-blue/10 ios-transition" />
+                          <input type="text" value={ex.name} onChange={(e) => updateExercise(idx, 'name', e.target.value)} className="w-full bg-apple-bg dark:bg-[#2C2C2E] border-2 border-black/[0.05] dark:border-white/10 rounded-2xl px-4 py-2 text-lg font-black dark:text-white focus:outline-none focus:border-vizofit-accent/50 focus:ring-4 focus:ring-vizofit-accent/10 ios-transition" />
                         ) : (
                           <h4 className="text-xl font-black tracking-tight dark:text-white leading-tight break-words uppercase">{ex.name}</h4>
                         )}
@@ -487,7 +499,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                     </div>
                   </div>
                   {isEditing ? (
-                    <textarea value={ex.instructions} onChange={(e) => updateExercise(idx, 'instructions', e.target.value)} className="w-full bg-apple-bg dark:bg-[#2C2C2E] border-2 border-black/[0.05] dark:border-white/10 rounded-2xl px-4 py-3 text-sm font-medium dark:text-apple-gray focus:outline-none focus:border-apple-blue/50 focus:ring-4 focus:ring-apple-blue/10 ios-transition min-h-[100px] leading-relaxed" />
+                    <textarea value={ex.instructions} onChange={(e) => updateExercise(idx, 'instructions', e.target.value)} className="w-full bg-apple-bg dark:bg-[#2C2C2E] border-2 border-black/[0.05] dark:border-white/10 rounded-2xl px-4 py-3 text-sm font-medium dark:text-apple-gray focus:outline-none focus:border-vizofit-accent/50 focus:ring-4 focus:ring-vizofit-accent/10 ios-transition min-h-[100px] leading-relaxed" />
                   ) : (
                     <p className="text-sm font-medium text-apple-label dark:text-apple-gray/80 leading-relaxed ps-9 break-words">{ex.instructions}</p>
                   )}
@@ -501,14 +513,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                       <span className="text-2xl font-black text-apple-text dark:text-white tracking-tighter uppercase">{formatSmartDisplay(ex.sets, settings.units)}</span>
                     )}
                   </div>
-                  <div className={`p-4 rounded-[2rem] flex flex-col items-center justify-center text-center ${isEditing ? 'bg-apple-blue/5' : 'bg-apple-blue/10'}`}>
-                    <span className="text-[8px] font-black text-apple-blue uppercase tracking-widest mb-1">{t.workout.reps}</span>
-                    {isEditing ? (
-                      <input type="text" value={ex.reps} onChange={(e) => updateExercise(idx, 'reps', e.target.value)} className="w-full bg-transparent text-center text-xl font-black text-apple-blue focus:outline-none placeholder:text-apple-blue/30 p-0 border-none ring-0 shadow-none focus:ring-0 focus:border-none" placeholder="Reps" />
-                    ) : (
-                      <span className="text-2xl font-black text-apple-blue tracking-tighter uppercase">{formatSmartDisplay(ex.reps, settings.units)}</span>
-                    )}
-                  </div>
+                  <span className="text-2xl font-black text-apple-text dark:text-vizofit-accent tracking-tighter uppercase">{formatSmartDisplay(ex.reps, settings.units)}</span>
                 </div>
               </div>
             ))}
@@ -517,15 +522,15 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
 
         <div className="lg:col-span-4 space-y-6 sticky top-24">
           <section className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden group inner-glow">
-            <div className="absolute top-0 inset-e-0 size-32 bg-apple-blue/10 dark:bg-apple-blue/30 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 rtl:-translate-x-1/2 group-hover:scale-125 transition-transform duration-1000"></div>
+            <div className="absolute top-0 inset-e-0 size-32 bg-vizofit-accent/10 dark:bg-vizofit-accent/30 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 rtl:-translate-x-1/2 group-hover:scale-125 transition-transform duration-1000"></div>
             <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-full bg-apple-blue flex items-center justify-center text-white shadow-lg">
+                <div className="size-10 rounded-full bg-vizofit-accent flex items-center justify-center text-apple-text shadow-lg">
                   <span className="material-symbols-rounded font-black text-xl">timer</span>
                 </div>
                 <div className="flex flex-col -space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-widest text-apple-gray dark:text-white/40">Estimated</span>
-                  <span className="text-xl font-black text-apple-text dark:text-white uppercase tracking-tight">{currentRoutine.estimatedDuration}</span>
+                  <span className="text-xl font-black text-vizofit-accent uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.15)] dark:drop-shadow-none">{currentRoutine.estimatedDuration}</span>
                 </div>
               </div>
               <div className="space-y-4">
@@ -533,7 +538,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                 <ul className="space-y-3">
                   {currentRoutine.safetyTips.map((tip, i) => (
                     <li key={i} className="flex gap-3 text-xs font-bold leading-relaxed text-apple-label dark:text-white/80 uppercase tracking-tight">
-                      <span className="material-symbols-rounded text-apple-blue text-sm">shield</span>
+                      <span className="material-symbols-rounded text-vizofit-accent text-sm">shield</span>
                       {tip}
                     </li>
                   ))}
@@ -541,7 +546,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
               </div>
               <div className="pt-6 border-t border-black/5 dark:border-white/10 flex flex-col gap-3">
                 {!isEditing && (
-                  <button onClick={() => setIsActiveMode(true)} className="w-full bg-apple-blue text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg ios-transition active:scale-95 flex items-center justify-center gap-3 ring-2 ring-apple-blue/20">
+                  <button onClick={() => setIsActiveMode(true)} className="w-full bg-vizofit-accent text-apple-text py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg ios-transition active:scale-95 flex items-center justify-center gap-3 ring-2 ring-vizofit-accent/20">
                     <span className="material-symbols-rounded fill-1">play_arrow</span>
                     {t.workout.startTraining}
                   </button>
@@ -559,7 +564,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                   </button>
                 </div>
                 <div className={`flex items-center w-full transition-all duration-500 overflow-hidden ${sessionSavedId ? 'gap-3' : 'gap-0'}`}>
-                  <button onClick={handleSaveClick} className={`h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border transition-all duration-500 ease-in-out ${sessionSavedId ? 'bg-green-600/20 text-green-600 dark:text-green-400 border-green-500/20 flex-grow-[2]' : 'bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border-black/5 dark:border-white/5 flex-grow'}`}>
+                  <button onClick={handleSaveClick} className={`h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border transition-all duration-500 ease-in-out ${sessionSavedId ? 'bg-vizofit-accent/20 dark:bg-vizofit-accent/30 text-apple-text dark:text-vizofit-accent border-vizofit-accent/30 dark:border-vizofit-accent/40 shadow-[0_0_20px_rgba(12,244,227,0.1)] flex-grow-[2]' : 'bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border-black/5 dark:border-white/5 flex-grow'}`}>
                     <span className="material-symbols-rounded text-sm">{sessionSavedId ? 'bookmark_added' : 'bookmark_add'}</span>
                     {sessionSavedId ? 'Saved' : 'Save'}
                   </button>
@@ -569,7 +574,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                     </button>
                   </div>
                 </div>
-                <button onClick={onReset} className="w-full bg-red-500/5 hover:bg-red-500/10 text-red-500 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border border-red-500/10 mt-2">
+                <button onClick={onReset} className="w-full bg-apple-gray/10 hover:bg-apple-gray/20 text-apple-gray py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border border-apple-gray/10 mt-2">
                   <span className="material-symbols-rounded text-sm">logout</span>
                   {t.workout.exitBtn}
                 </button>
@@ -578,7 +583,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
           </section>
 
 
-          <button onClick={() => setShowDisclaimer(true)} className="w-full py-4 rounded-2xl border-2 border-dashed border-apple-gray/20 dark:border-white/10 text-apple-gray font-black text-[10px] uppercase tracking-widest hover:border-apple-blue/40 hover:text-apple-blue transition-colors">
+          <button onClick={() => setShowDisclaimer(true)} className="w-full py-4 rounded-2xl border-2 border-dashed border-apple-gray/20 dark:border-white/10 text-apple-gray font-black text-[10px] uppercase tracking-widest hover:border-vizofit-accent/40 hover:text-vizofit-accent transition-colors">
             {t.workout.legalDisclaimerBtn}
           </button>
         </div>
@@ -596,7 +601,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
             <div className="space-y-4 text-[12px] leading-relaxed text-apple-label dark:text-apple-gray font-medium">
               {t.workout.legalBody.map((p, i) => <p key={i}>{p}</p>)}
             </div>
-            <button onClick={() => setShowDisclaimer(false)} className="w-full bg-apple-blue text-white py-3 rounded-2xl font-bold text-sm">{t.workout.legalUnderstand}</button>
+            <button onClick={() => setShowDisclaimer(false)} className="w-full bg-vizofit-accent text-apple-text py-3 rounded-2xl font-bold text-sm">{t.workout.legalUnderstand}</button>
           </div>
         </div>
       )}

@@ -68,22 +68,22 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
       <div className="space-y-6">
         <section className="bg-white dark:bg-[#1C1C1E] rounded-[2rem] shadow-ios border border-black/5 dark:border-white/5 relative">
           <div className="p-6 border-b border-apple-bg dark:border-white/5">
-             <h3 className="text-[10px] font-black text-apple-gray dark:text-apple-gray uppercase tracking-widest mb-1">{t.settings.prefTitle}</h3>
-             <p className="text-xs font-medium text-apple-label/60 dark:text-apple-gray/60">{t.settings.prefDesc}</p>
+            <h3 className="text-[10px] font-black text-apple-gray dark:text-apple-gray uppercase tracking-widest mb-1">{t.settings.prefTitle}</h3>
+            <p className="text-xs font-medium text-apple-label/60 dark:text-apple-gray/60">{t.settings.prefDesc}</p>
           </div>
           <div className="p-6 space-y-8">
             <div className="flex items-center justify-between gap-4">
               <span className="font-bold text-sm text-apple-text dark:text-white">{t.settings.unitSystem}</span>
               <div className="flex bg-black/[0.05] dark:bg-white/[0.05] p-1 rounded-full border border-black/[0.02] dark:border-white/[0.02] shadow-inner no-print shrink-0">
-                <button 
+                <button
                   onClick={() => toggleUnits('metric')}
-                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${settings.units === 'metric' ? 'bg-white dark:bg-[#3A3A3C] shadow-md text-apple-blue scale-100 opacity-100' : 'text-apple-gray hover:text-apple-text scale-95 opacity-50 active:scale-90'}`}
+                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${settings.units === 'metric' ? 'bg-white dark:bg-[#3A3A3C] shadow-md text-vizofit-accent scale-100 opacity-100' : 'text-apple-gray hover:text-apple-text scale-95 opacity-50 active:scale-90'}`}
                 >
                   {t.settings.metric}
                 </button>
-                <button 
+                <button
                   onClick={() => toggleUnits('imperial')}
-                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${settings.units === 'imperial' ? 'bg-white dark:bg-[#3A3A3C] shadow-md text-apple-blue scale-100 opacity-100' : 'text-apple-gray hover:text-apple-text scale-95 opacity-50 active:scale-90'}`}
+                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${settings.units === 'imperial' ? 'bg-white dark:bg-[#3A3A3C] shadow-md text-vizofit-accent scale-100 opacity-100' : 'text-apple-gray hover:text-apple-text scale-95 opacity-50 active:scale-90'}`}
                 >
                   {t.settings.imperial}
                 </button>
@@ -94,10 +94,10 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
               <span className="font-bold text-sm text-apple-text dark:text-white">Appearance</span>
               <div className="flex bg-black/[0.05] dark:bg-white/[0.05] p-1 rounded-full border border-black/[0.02] dark:border-white/[0.02] shadow-inner no-print shrink-0">
                 {(['light', 'dark', 'system'] as const).map((mode) => (
-                  <button 
+                  <button
                     key={mode}
                     onClick={() => setAppearance(mode)}
-                    className={`px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${settings.appearance === mode ? 'bg-white dark:bg-[#3A3A3C] shadow-md text-apple-blue scale-100 opacity-100' : 'text-apple-gray hover:text-apple-text scale-95 opacity-50 active:scale-90'}`}
+                    className={`px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${settings.appearance === mode ? 'bg-white dark:bg-[#3A3A3C] shadow-md text-vizofit-accent scale-100 opacity-100' : 'text-apple-gray hover:text-apple-text scale-95 opacity-50 active:scale-90'}`}
                   >
                     {mode}
                   </button>
@@ -108,17 +108,17 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
             <div className="flex items-center justify-between gap-4">
               <span className="font-bold text-sm text-apple-text dark:text-white">{t.settings.language}</span>
               <div className="relative shrink-0 w-32" ref={dropdownRef}>
-                <div 
+                <div
                   onClick={() => {
                     soundService.playTap();
                     setIsLangOpen(!isLangOpen);
                   }}
-                  className={`flex items-center justify-between bg-black/[0.05] dark:bg-white/[0.05] border border-black/[0.02] dark:border-white/[0.02] shadow-inner rounded-full px-5 py-2.5 cursor-pointer transition-all duration-300 active:scale-95 ${isLangOpen ? 'ring-4 ring-apple-blue/10 border-apple-blue/20' : ''}`}
+                  className={`flex items-center justify-between bg-black/[0.05] dark:bg-white/[0.05] border border-black/[0.02] dark:border-white/[0.02] shadow-inner rounded-full px-5 py-2.5 cursor-pointer transition-all duration-300 active:scale-95 ${isLangOpen ? 'ring-4 ring-vizofit-accent/10 border-vizofit-accent/20' : ''}`}
                 >
                   <span className="text-[10px] font-black uppercase tracking-widest text-apple-text dark:text-white">
                     {settings.language.toUpperCase()}
                   </span>
-                  <span className={`material-symbols-rounded text-lg text-apple-blue font-black transition-transform duration-300 ${isLangOpen ? 'rotate-180' : 'rotate-0'}`}>
+                  <span className={`material-symbols-rounded text-lg text-vizofit-accent font-black transition-transform duration-300 ${isLangOpen ? 'rotate-180' : 'rotate-0'}`}>
                     expand_more
                   </span>
                 </div>
@@ -136,10 +136,10 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
                         { code: 'hi', name: 'हिन्दी' },
                         { code: 'ar', name: 'العربية' }
                       ].map((lang) => (
-                        <button 
+                        <button
                           key={lang.code}
                           onClick={() => handleLanguageChange(lang.code as any)}
-                          className={`w-full px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest rounded-ios transition-colors mt-0.5 first:mt-0 ${settings.language === lang.code ? 'bg-apple-blue text-white shadow-sm' : 'text-apple-text dark:text-white hover:bg-apple-bg dark:hover:bg-white/5'}`}
+                          className={`w-full px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest rounded-ios transition-colors mt-0.5 first:mt-0 ${settings.language === lang.code ? 'bg-vizofit-accent text-apple-text shadow-sm' : 'text-apple-text dark:text-white hover:bg-apple-bg dark:hover:bg-white/5'}`}
                         >
                           {lang.name}
                         </button>
@@ -154,16 +154,16 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
 
         <section className="bg-white dark:bg-[#1C1C1E] rounded-[2rem] shadow-ios border border-black/5 dark:border-white/5 overflow-hidden">
           <div className="p-6 border-b border-apple-bg dark:border-white/5">
-             <h3 className="text-[10px] font-black text-apple-gray dark:text-apple-gray uppercase tracking-widest mb-1">{t.settings.audioTitle}</h3>
-             <p className="text-xs font-medium text-apple-label/60 dark:text-apple-gray/60">{t.settings.audioDesc}</p>
+            <h3 className="text-[10px] font-black text-apple-gray dark:text-apple-gray uppercase tracking-widest mb-1">{t.settings.audioTitle}</h3>
+            <p className="text-xs font-medium text-apple-label/60 dark:text-apple-gray/60">{t.settings.audioDesc}</p>
           </div>
           <div className="p-6">
-            <button 
+            <button
               onClick={toggleMute}
               className="w-full flex items-center justify-between group"
             >
               <div className="flex items-center gap-4">
-                <div className={`size-10 rounded-full flex items-center justify-center ios-transition ${settings.isMuted ? 'bg-apple-bg dark:bg-white/5 text-apple-gray' : 'bg-apple-blue/10 text-apple-blue'}`}>
+                <div className={`size-10 rounded-full flex items-center justify-center ios-transition ${settings.isMuted ? 'bg-apple-bg dark:bg-white/5 text-apple-gray' : 'bg-vizofit-accent/10 text-vizofit-accent'}`}>
                   <span className="material-symbols-rounded text-xl">
                     {settings.isMuted ? 'volume_off' : 'volume_up'}
                   </span>
@@ -173,7 +173,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
                   <span className="block text-[10px] font-medium text-apple-gray">{settings.isMuted ? t.settings.muted : t.settings.enabled}</span>
                 </div>
               </div>
-              <div className={`w-12 h-6 rounded-full ios-transition relative ${settings.isMuted ? 'bg-apple-gray/20' : 'bg-apple-blue'}`}>
+              <div className={`w-12 h-6 rounded-full ios-transition relative ${settings.isMuted ? 'bg-apple-gray/20' : 'bg-vizofit-accent'}`}>
                 <div className={`absolute top-1 size-4 bg-white rounded-full shadow-sm ios-transition ${settings.isMuted ? 'left-1' : 'left-7'}`}></div>
               </div>
             </button>
@@ -182,12 +182,12 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdateSettings, onBack,
 
         <section className="bg-white dark:bg-[#1C1C1E] rounded-[2rem] shadow-ios border border-black/5 dark:border-white/5 overflow-hidden">
           <div className="p-6 border-b border-apple-bg dark:border-white/5">
-             <h3 className="text-[10px] font-black text-apple-gray uppercase tracking-widest mb-1">{t.settings.aboutTitle}</h3>
+            <h3 className="text-[10px] font-black text-apple-gray uppercase tracking-widest mb-1">{t.settings.aboutTitle}</h3>
           </div>
           <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-apple-text dark:text-white">{t.settings.version}</span>
-              <span className="text-xs font-black text-apple-blue">{t.common.fullVersion}</span>
+              <span className="text-xs font-black text-vizofit-accent">{t.common.fullVersion}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-apple-text dark:text-white">{t.settings.aiModel}</span>

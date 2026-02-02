@@ -13,7 +13,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -48,13 +48,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
     soundService.playCameraTick();
     setCameraError(null);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment', 
-          width: { ideal: 1080 }, 
-          height: { ideal: 1080 } 
-        }, 
-        audio: false 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1080 },
+          height: { ideal: 1080 }
+        },
+        audio: false
       });
       setCameraStream(stream);
       setIsCameraActive(true);
@@ -86,13 +86,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
       if (context) {
         setIsCapturing(true);
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
+
         const rawData = canvas.toDataURL('image/jpeg', 0.9);
         // Bandwidth optimization: Compress to a web-optimized size before API call
         const webOptimized = await compressBase64(rawData, 1024, 0.75);
-        
+
         onImageSelected(webOptimized.split(',')[1]);
-        
+
         // Immediate Cleanup
         if (cameraStream) {
           cameraStream.getTracks().forEach(track => track.stop());
@@ -118,10 +118,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
         {isLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-black/95 backdrop-blur-md z-[60] px-8 text-center space-y-8 animate-in fade-in duration-500 overflow-hidden">
             <div className="absolute inset-0 z-10 pointer-events-none opacity-20">
-              <div className="absolute left-0 right-0 h-1 bg-apple-blue shadow-[0_0_15px_rgba(0,122,255,1)] animate-scan"></div>
+              <div className="absolute left-0 right-0 h-1 bg-vizofit-accent shadow-[0_0_15px_rgba(12,244,227,1)] animate-scan"></div>
             </div>
-            <div className="size-24 bg-apple-blue/20 rounded-full flex items-center justify-center animate-glow">
-              <span className="material-symbols-rounded text-apple-blue text-5xl">analytics</span>
+            <div className="size-24 bg-vizofit-accent/20 rounded-full flex items-center justify-center animate-glow">
+              <span className="material-symbols-rounded text-vizofit-accent text-5xl">analytics</span>
             </div>
             <div className="space-y-3 w-full">
               <h3 className="text-2xl font-bold tracking-tight animate-pulse text-apple-text dark:text-white">{t.uploader.analyzingTitle}</h3>
@@ -145,7 +145,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
         ) : (
           <button onClick={startCamera} className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center ios-transition hover:bg-apple-bg/30 dark:hover:bg-white/5 active:scale-[0.98] group">
             <div className="size-24 rounded-full bg-white dark:bg-[#2C2C2E] flex items-center justify-center mb-6 border border-black/[0.02] dark:border-white/10 shadow-sm group-hover:scale-105 ios-transition">
-              <span className="material-symbols-rounded text-6xl text-apple-blue font-light">camera</span>
+              <span className="material-symbols-rounded text-6xl text-vizofit-accent font-light">camera</span>
             </div>
             <h3 className="text-2xl font-black tracking-tight mb-2 text-apple-text dark:text-white">{t.uploader.snapTitle}</h3>
             <p className="text-apple-gray font-bold text-sm px-4">{t.uploader.snapDesc}</p>
@@ -155,7 +155,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
 
       {!isLoading && !isCameraActive && (
         <div className="mt-8 flex justify-center animate-reveal stagger-2">
-          <button 
+          <button
             onClick={triggerUpload}
             className="flex items-center gap-3 px-8 py-4 rounded-full bg-apple-text dark:bg-[#1C1C1E] text-white dark:text-white border border-transparent dark:border-white/10 font-black text-xs ios-transition hover:opacity-90 active:scale-95 shadow-lg dark:shadow-none uppercase tracking-widest"
           >

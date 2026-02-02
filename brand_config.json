@@ -1,0 +1,52 @@
+{
+    "projectInfo": {
+        "name": "VizoFit",
+        "tagline": "AI-Powered Training Intelligence",
+        "description": "Snap a photo of any gym equipment or exercise space to instantly generate a professional workout routine tailored to your setup.",
+        "website": "https://VizoFit.ai",
+        "supportEmail": "hello@VizoFit.ai"
+    },
+    "branding": {
+        "colors": {
+            "primary": "#245160",
+            "secondary": "#757C84",
+            "background": "#EBEAEA",
+            "card": "#FFFFFF",
+            "accent": "#0cf4e3",
+            "neutral": "#747484",
+            "text": "#1D1D1F",
+            "success": "#34C759",
+            "warning": "#FFCC00",
+            "danger": "#FF3B30"
+        },
+        "typography": {
+            "primary": "Baloo Chettan 2",
+            "fallback": "sans-serif",
+            "weight": "700"
+        },
+        "assets": {
+            "logo": "assets/Branding/Logo.png",
+            "logo_svg": "assets/Branding/SVG/Color_logo.svg",
+            "logo_icon_svg": "assets/Branding/SVG/Color_logo_Icon.svg",
+            "logoVariants": [
+                "assets/Branding/Logo Variant 1.png",
+                "assets/Branding/Logo Variant 2.png",
+                "assets/Branding/Logo Variant 3.png",
+                "assets/Branding/SVG/Dark_logo.svg",
+                "assets/Branding/SVG/Light_logo.svg"
+            ],
+            "starterPack": [
+                "assets/Branding/Starter Pack Image 1.png",
+                "assets/Branding/Starter Pack Image 2.png",
+                "assets/Branding/Starter Pack Image 3.png",
+                "assets/Branding/Starter Pack Image 4.png"
+            ]
+        }
+    },
+    "marketing": {
+        "social": {
+            "instagram": "https://instagram.com/VizoFit",
+            "twitter": "https://twitter.com/VizoFit"
+        }
+    }
+}

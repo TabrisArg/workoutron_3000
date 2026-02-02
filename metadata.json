@@ -1,6 +1,6 @@
 {
-  "name": "Workoutron 3000",
-  "description": "Snap a photo of any gym equipment or exercise space to instantly generate a professional workout routine tailored to your setup.",
+  "name": "VizoFit",
+  "description": "AI-Powered Gym Intelligence. Snap a photo of any gear to generate a professional workout routine tailored to your setup.",
   "requestFramePermissions": [
     "camera"
   ]

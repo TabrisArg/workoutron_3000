@@ -1,10 +1,9 @@
-
 {
-  "short_name": "Workoutron",
-  "name": "Workoutron 3000 - Smart Workout Generator",
+  "short_name": "VizoFit",
+  "name": "VizoFit - AI Gym Intelligence",
   "icons": [
     {
-      "src": "https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png",
+      "src": "assets/Branding/Logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -12,8 +11,8 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#1a73e8",
-  "background_color": "#ffffff",
+  "theme_color": "#245160",
+  "background_color": "#EBEAEA",
   "orientation": "portrait",
-  "description": "Generate workouts from any gym equipment using AI."
+  "description": "AI-Powered Gym Intelligence. Snap a photo of any gear to generate a professional workout routine tailored to your setup."
 }
