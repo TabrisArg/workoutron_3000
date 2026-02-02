@@ -36,43 +36,6 @@ const ConfettiBurst: React.FC = () => {
   );
 };
 
-const ProUpgradeModal: React.FC<{ onClose: () => void, onUpgrade: () => void }> = ({ onClose, onUpgrade }) => {
-  return (
-    <div className="fixed inset-0 z-[5000] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-[#1C1C1E] p-10 rounded-[3rem] shadow-2xl max-w-sm w-full space-y-8 animate-spring text-center border border-white/10 overflow-hidden relative">
-         <div className="absolute top-0 inset-e-0 h-32 bg-gradient-to-b from-yellow-400/20 to-transparent"></div>
-         <div className="size-20 bg-yellow-400 text-black rounded-full flex items-center justify-center mx-auto shadow-2xl animate-glow-success relative z-10">
-            <span className="material-symbols-rounded text-4xl font-black">diamond</span>
-         </div>
-         <div className="space-y-2 relative z-10">
-            <h3 className="text-3xl font-black tracking-tight dark:text-white uppercase italic">Workoutron Pro</h3>
-            <p className="text-apple-gray text-sm font-bold uppercase tracking-widest opacity-80">Unlimited Intelligence</p>
-         </div>
-         <div className="space-y-4 text-left relative z-10">
-            {[
-              "Unlimited AI Photo Scans",
-              "High & Max Intensity Modes",
-              "Advanced PDF Exports",
-              "Custom Language Support",
-              "Ad-Free Premium Interface"
-            ].map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 text-xs font-bold text-apple-label dark:text-white/80">
-                <span className="material-symbols-rounded text-green-500">check_circle</span>
-                {feature}
-              </div>
-            ))}
-         </div>
-         <div className="space-y-3 pt-4 relative z-10">
-            <button onClick={onUpgrade} className="w-full bg-apple-blue text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg active:scale-95 transition-transform">
-              Start Free Trial
-            </button>
-            <p className="text-[10px] text-apple-gray font-bold">$5.99/mo after 7 days</p>
-            <button onClick={onClose} className="w-full py-3 text-apple-gray font-black text-[10px] uppercase tracking-widest hover:text-white">Maybe Later</button>
-         </div>
-      </div>
-    </div>
-  );
-};
 
 const App: React.FC = () => {
   const [view, setView] = useState<'analyzer' | 'library' | 'activity' | 'settings'>('analyzer');
@@ -82,16 +45,16 @@ const App: React.FC = () => {
   const [activeWorkoutId, setActiveWorkoutId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showProModal, setShowProModal] = useState(false);
-  
+
   const [settings, setSettings] = useState<UserSettings>(() => {
     const saved = localStorage.getItem('workoutron_settings');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return { appearance: 'system', language: getSystemLanguage(), isPro: false, ...parsed };
+        return { appearance: 'system', language: getSystemLanguage(), isPro: true, ...parsed };
       } catch (e) { console.error("Failed to parse settings", e); }
     }
-    return { units: 'metric', isMuted: false, language: getSystemLanguage(), appearance: 'system', isPro: false };
+    return { units: 'metric', isMuted: false, language: getSystemLanguage(), appearance: 'system', isPro: true };
   });
 
   const t = useMemo(() => getStringsByLanguage(settings.language), [settings.language]);
@@ -125,7 +88,7 @@ const App: React.FC = () => {
     setError(null);
     const dataUrl = `data:image/jpeg;base64,${base64}`;
     setImagePreview(dataUrl);
-    setActiveWorkoutId(null); 
+    setActiveWorkoutId(null);
     try {
       const result = await analyzeEquipment(base64, settings.units, settings.language);
       setRoutine(result);
@@ -208,7 +171,7 @@ const App: React.FC = () => {
                       )}
                     </div>
                   ) : (
-                    routine && <WorkoutRoutineDisplay routine={routine} imagePreview={imagePreview} initialSavedId={activeWorkoutId} settings={settings} t={t} onReset={() => { soundService.playCancel(); resetApp(); }} onComplete={handleWorkoutComplete} onUpgrade={() => setShowProModal(true)} onDuplicateDetected={() => {}} />
+                    routine && <WorkoutRoutineDisplay routine={routine} imagePreview={imagePreview} initialSavedId={activeWorkoutId} settings={settings} t={t} onReset={() => { soundService.playCancel(); resetApp(); }} onComplete={handleWorkoutComplete} onUpgrade={() => { }} onDuplicateDetected={() => { }} />
                   )}
                 </div>
               )}
@@ -247,8 +210,6 @@ const App: React.FC = () => {
           </div>
         </>
       )}
-
-      {showProModal && <ProUpgradeModal onClose={() => setShowProModal(false)} onUpgrade={handleUpgrade} />}
     </>
   );
 };

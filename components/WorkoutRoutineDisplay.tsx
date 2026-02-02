@@ -82,17 +82,17 @@ const parseTimeSeconds = (str: string | undefined): number | null => {
 };
 
 const INTENSITY_LEVELS = [
-  { id: 1, mult: 0.5, color: '#BAE6FD', label: 'LITE', isPremium: false }, 
+  { id: 1, mult: 0.5, color: '#BAE6FD', label: 'LITE', isPremium: false },
   { id: 2, mult: 0.75, color: '#7DD3FC', label: 'LOW', isPremium: false },
   { id: 3, mult: 1.0, color: '#007AFF', label: 'MID', isPremium: false },
-  { id: 4, mult: 1.25, color: '#1D4ED8', label: 'HIGH', isPremium: true },
-  { id: 5, mult: 1.5, color: '#1E3A8A', label: 'MAX', isPremium: true }
+  { id: 4, mult: 1.25, color: '#1D4ED8', label: 'HIGH', isPremium: false },
+  { id: 5, mult: 1.5, color: '#1E3A8A', label: 'MAX', isPremium: false }
 ];
 
-const ActiveTrainingOverlay: React.FC<{ 
-  exercises: Exercise[], 
-  units: 'metric' | 'imperial', 
-  t: TranslationSchema, 
+const ActiveTrainingOverlay: React.FC<{
+  exercises: Exercise[],
+  units: 'metric' | 'imperial',
+  t: TranslationSchema,
   onClose: () => void,
   onComplete: () => void
 }> = ({ exercises, units, t, onClose, onComplete }) => {
@@ -215,12 +215,12 @@ const ActiveTrainingOverlay: React.FC<{
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-apple-bg dark:bg-[#1C1C1E] p-4 rounded-2xl flex flex-col border border-black/5 dark:border-white/5">
-               <span className="text-[9px] font-black text-apple-gray uppercase tracking-widest">{t.workout.exerciseLabel}</span>
-               <span className="text-lg font-black dark:text-white">{currentExercise.weight || 'Body'}</span>
+              <span className="text-[9px] font-black text-apple-gray uppercase tracking-widest">{t.workout.exerciseLabel}</span>
+              <span className="text-lg font-black dark:text-white">{currentExercise.weight || 'Body'}</span>
             </div>
             <div className="bg-apple-bg dark:bg-[#1C1C1E] p-4 rounded-2xl flex flex-col border border-black/5 dark:border-white/5">
-               <span className="text-[9px] font-black text-apple-gray uppercase tracking-widest">{t.workout.rest}</span>
-               <span className="text-lg font-black dark:text-white">{currentExercise.rest}</span>
+              <span className="text-[9px] font-black text-apple-gray uppercase tracking-widest">{t.workout.rest}</span>
+              <span className="text-lg font-black dark:text-white">{currentExercise.rest}</span>
             </div>
           </div>
         </div>
@@ -260,9 +260,6 @@ const IntensityGauge: React.FC<{ activeId: number, isPro: boolean, onChange: (id
           {INTENSITY_LEVELS.map(level => (
             <button key={level.id} onClick={() => onChange(level.id)} className="flex-1 h-full cursor-pointer z-20 outline-none flex items-center justify-center relative">
               <span className={`text-[8px] font-black uppercase tracking-tighter transition-opacity duration-300 ${level.id === activeId ? 'opacity-0' : 'opacity-30 dark:text-white'}`}>{level.label}</span>
-              {level.isPremium && !isPro && (
-                <span className="material-symbols-rounded text-[8px] text-yellow-500 absolute top-1 right-1 font-black opacity-40">lock</span>
-              )}
             </button>
           ))}
         </div>
@@ -305,12 +302,12 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
     };
   }, [baselineRoutine, intensityId]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (initialSavedId && initialSavedId !== sessionSavedId) setSessionSavedId(initialSavedId);
     if (initialSavedId) {
-       const saved = JSON.parse(localStorage.getItem('equipfit_saved') || '[]');
-       const current = saved.find((s: SavedWorkout) => s.id === initialSavedId);
-       if (current) setIsFavorited(!!current.isFavorited);
+      const saved = JSON.parse(localStorage.getItem('equipfit_saved') || '[]');
+      const current = saved.find((s: SavedWorkout) => s.id === initialSavedId);
+      if (current) setIsFavorited(!!current.isFavorited);
     }
   }, [initialSavedId]);
 
@@ -361,12 +358,6 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
   };
 
   const handleIntensityChange = (id: number) => {
-    const target = INTENSITY_LEVELS.find(l => l.id === id);
-    if (target?.isPremium && !settings.isPro) {
-      soundService.playSad();
-      onUpgrade();
-      return;
-    }
     if (id > intensityId) soundService.playAscending();
     else if (id < intensityId) soundService.playDescending();
     setIntensityId(id);
@@ -419,7 +410,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
         body.reordering-active { cursor: grabbing !important; user-select: none !important; }
         body.reordering-active * { cursor: grabbing !important; pointer-events: auto !important; }
       `}</style>
-      
+
       {isActiveMode && (
         <ActiveTrainingOverlay exercises={currentRoutine.exercises} units={settings.units} t={t} onClose={() => setIsActiveMode(false)} onComplete={finalizeWorkout} />
       )}
@@ -430,7 +421,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
 
       <div className="relative aspect-[16/10] md:aspect-[21/9] rounded-ios-lg overflow-hidden shadow-ios animate-reveal">
         <img src={imagePreview || ''} className="w-full h-full object-cover" alt="Equip" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10 flex flex-col justify-end p-8">
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-1 overflow-hidden w-full">
               <div className="flex items-center gap-2">
@@ -461,7 +452,6 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
               <div className="flex flex-col gap-1">
                 <h3 className="text-xl font-black tracking-tight dark:text-white uppercase">
                   {t.workout.intensityTitle}
-                  {!settings.isPro && <span className="ms-3 text-[9px] bg-yellow-400 text-black px-2 py-0.5 rounded-full font-black">PRO FEATURE</span>}
                 </h3>
                 <p className="text-[10px] font-black text-apple-gray uppercase tracking-widest">Adjust volume based on your capacity</p>
               </div>
@@ -503,22 +493,22 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                   )}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-1 gap-3 shrink-0 md:w-36">
-                   <div className="p-4 rounded-[2rem] flex flex-col items-center justify-center text-center bg-apple-bg dark:bg-[#2C2C2E]">
-                      <span className="text-[8px] font-black text-apple-gray uppercase tracking-widest mb-1">{t.workout.sets}</span>
-                      {isEditing ? (
-                        <input type="text" value={ex.sets} onChange={(e) => updateExercise(idx, 'sets', e.target.value)} className="w-full bg-transparent text-center text-xl font-black dark:text-white focus:outline-none placeholder:text-apple-gray/30 p-0 border-none ring-0 shadow-none focus:ring-0 focus:border-none" placeholder="Sets" />
-                      ) : (
-                        <span className="text-2xl font-black text-apple-text dark:text-white tracking-tighter uppercase">{formatSmartDisplay(ex.sets, settings.units)}</span>
-                      )}
-                   </div>
-                   <div className={`p-4 rounded-[2rem] flex flex-col items-center justify-center text-center ${isEditing ? 'bg-apple-blue/5' : 'bg-apple-blue/10'}`}>
-                      <span className="text-[8px] font-black text-apple-blue uppercase tracking-widest mb-1">{t.workout.reps}</span>
-                      {isEditing ? (
-                        <input type="text" value={ex.reps} onChange={(e) => updateExercise(idx, 'reps', e.target.value)} className="w-full bg-transparent text-center text-xl font-black text-apple-blue focus:outline-none placeholder:text-apple-blue/30 p-0 border-none ring-0 shadow-none focus:ring-0 focus:border-none" placeholder="Reps" />
-                      ) : (
-                        <span className="text-2xl font-black text-apple-blue tracking-tighter uppercase">{formatSmartDisplay(ex.reps, settings.units)}</span>
-                      )}
-                   </div>
+                  <div className="p-4 rounded-[2rem] flex flex-col items-center justify-center text-center bg-apple-bg dark:bg-[#2C2C2E]">
+                    <span className="text-[8px] font-black text-apple-gray uppercase tracking-widest mb-1">{t.workout.sets}</span>
+                    {isEditing ? (
+                      <input type="text" value={ex.sets} onChange={(e) => updateExercise(idx, 'sets', e.target.value)} className="w-full bg-transparent text-center text-xl font-black dark:text-white focus:outline-none placeholder:text-apple-gray/30 p-0 border-none ring-0 shadow-none focus:ring-0 focus:border-none" placeholder="Sets" />
+                    ) : (
+                      <span className="text-2xl font-black text-apple-text dark:text-white tracking-tighter uppercase">{formatSmartDisplay(ex.sets, settings.units)}</span>
+                    )}
+                  </div>
+                  <div className={`p-4 rounded-[2rem] flex flex-col items-center justify-center text-center ${isEditing ? 'bg-apple-blue/5' : 'bg-apple-blue/10'}`}>
+                    <span className="text-[8px] font-black text-apple-blue uppercase tracking-widest mb-1">{t.workout.reps}</span>
+                    {isEditing ? (
+                      <input type="text" value={ex.reps} onChange={(e) => updateExercise(idx, 'reps', e.target.value)} className="w-full bg-transparent text-center text-xl font-black text-apple-blue focus:outline-none placeholder:text-apple-blue/30 p-0 border-none ring-0 shadow-none focus:ring-0 focus:border-none" placeholder="Reps" />
+                    ) : (
+                      <span className="text-2xl font-black text-apple-blue tracking-tighter uppercase">{formatSmartDisplay(ex.reps, settings.units)}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -531,7 +521,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
             <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-3">
                 <div className="size-10 rounded-full bg-apple-blue flex items-center justify-center text-white shadow-lg">
-                   <span className="material-symbols-rounded font-black text-xl">timer</span>
+                  <span className="material-symbols-rounded font-black text-xl">timer</span>
                 </div>
                 <div className="flex flex-col -space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-widest text-apple-gray dark:text-white/40">Estimated</span>
@@ -539,68 +529,54 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                 </div>
               </div>
               <div className="space-y-4">
-                 <h4 className="text-[10px] font-black uppercase tracking-widest text-apple-gray dark:text-white/30">{t.workout.safetyTitle}</h4>
-                 <ul className="space-y-3">
-                   {currentRoutine.safetyTips.map((tip, i) => (
-                     <li key={i} className="flex gap-3 text-xs font-bold leading-relaxed text-apple-label dark:text-white/80 uppercase tracking-tight">
-                       <span className="material-symbols-rounded text-apple-blue text-sm">shield</span>
-                       {tip}
-                     </li>
-                   ))}
-                 </ul>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-apple-gray dark:text-white/30">{t.workout.safetyTitle}</h4>
+                <ul className="space-y-3">
+                  {currentRoutine.safetyTips.map((tip, i) => (
+                    <li key={i} className="flex gap-3 text-xs font-bold leading-relaxed text-apple-label dark:text-white/80 uppercase tracking-tight">
+                      <span className="material-symbols-rounded text-apple-blue text-sm">shield</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
               </div>
               <div className="pt-6 border-t border-black/5 dark:border-white/10 flex flex-col gap-3">
-                 {!isEditing && (
-                   <button onClick={() => setIsActiveMode(true)} className="w-full bg-apple-blue text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg ios-transition active:scale-95 flex items-center justify-center gap-3 ring-2 ring-apple-blue/20">
-                      <span className="material-symbols-rounded fill-1">play_arrow</span>
-                      {t.workout.startTraining}
-                   </button>
-                 )}
-                 <div className="grid grid-cols-2 gap-3">
-                    <button onClick={handleEditToggle} className={`py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border shadow-sm ${isEditing ? 'bg-green-500 text-white border-green-400' : 'bg-black/5 dark:bg-[#2C2C2E] text-apple-text dark:text-white border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-[#3A3A3C]'}`}>
-                      <span className="material-symbols-rounded text-sm">{isEditing ? 'check_circle' : 'edit'}</span>
-                      {isEditing ? 'Save' : 'Edit'}
-                    </button>
-                    <button onClick={() => { soundService.playTap(); setShowShareStudio(true); }} className="py-4 rounded-2xl bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border border-black/5 dark:border-white/5 font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-3 active:scale-95 group transition-all">
-                      <span className="material-symbols-rounded text-lg group-hover:scale-110 transition-transform leading-none">share</span>
-                      <div className="flex flex-col items-start leading-[1.1]">
-                        {t.workout.shareBtn.split(' ').map((word, i) => <span key={i} className="block">{word}</span>)}
-                      </div>
-                    </button>
-                 </div>
-                 <div className={`flex items-center w-full transition-all duration-500 overflow-hidden ${sessionSavedId ? 'gap-3' : 'gap-0'}`}>
-                    <button onClick={handleSaveClick} className={`h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border transition-all duration-500 ease-in-out ${sessionSavedId ? 'bg-green-600/20 text-green-600 dark:text-green-400 border-green-500/20 flex-grow-[2]' : 'bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border-black/5 dark:border-white/5 flex-grow'}`}>
-                       <span className="material-symbols-rounded text-sm">{sessionSavedId ? 'bookmark_added' : 'bookmark_add'}</span>
-                       {sessionSavedId ? 'Saved' : 'Save'}
-                    </button>
-                    <div className={`transition-all duration-500 ease-in-out flex items-center ${sessionSavedId ? 'w-14 opacity-100 scale-100' : 'w-0 opacity-0 scale-50 pointer-events-none'}`}>
-                      <button onClick={toggleFavorite} className={`size-14 rounded-2xl flex items-center justify-center ios-transition border-2 shrink-0 ${isFavorited ? 'bg-yellow-400 border-yellow-200 text-white shadow-[0_0_20px_rgba(250,204,21,0.4)]' : 'bg-black/5 dark:bg-[#2C2C2E] border-black/5 dark:border-white/20 text-apple-text dark:text-white hover:bg-yellow-400/10'}`}>
-                         <span className={`material-symbols-rounded text-[22px] leading-none transition-all duration-300 ${isFavorited ? 'fill-1 scale-125' : 'scale-100'}`}>star</span>
-                      </button>
+                {!isEditing && (
+                  <button onClick={() => setIsActiveMode(true)} className="w-full bg-apple-blue text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg ios-transition active:scale-95 flex items-center justify-center gap-3 ring-2 ring-apple-blue/20">
+                    <span className="material-symbols-rounded fill-1">play_arrow</span>
+                    {t.workout.startTraining}
+                  </button>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={handleEditToggle} className={`py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border shadow-sm ${isEditing ? 'bg-green-500 text-white border-green-400' : 'bg-black/5 dark:bg-[#2C2C2E] text-apple-text dark:text-white border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-[#3A3A3C]'}`}>
+                    <span className="material-symbols-rounded text-sm">{isEditing ? 'check_circle' : 'edit'}</span>
+                    {isEditing ? 'Save' : 'Edit'}
+                  </button>
+                  <button onClick={() => { soundService.playTap(); setShowShareStudio(true); }} className="py-4 rounded-2xl bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border border-black/5 dark:border-white/5 font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-3 active:scale-95 group transition-all">
+                    <span className="material-symbols-rounded text-lg group-hover:scale-110 transition-transform leading-none">share</span>
+                    <div className="flex flex-col items-start leading-[1.1]">
+                      {t.workout.shareBtn.split(' ').map((word, i) => <span key={i} className="block">{word}</span>)}
                     </div>
-                 </div>
-                 <button onClick={onReset} className="w-full bg-red-500/5 hover:bg-red-500/10 text-red-500 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border border-red-500/10 mt-2">
-                    <span className="material-symbols-rounded text-sm">logout</span>
-                    {t.workout.exitBtn}
-                 </button>
+                  </button>
+                </div>
+                <div className={`flex items-center w-full transition-all duration-500 overflow-hidden ${sessionSavedId ? 'gap-3' : 'gap-0'}`}>
+                  <button onClick={handleSaveClick} className={`h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border transition-all duration-500 ease-in-out ${sessionSavedId ? 'bg-green-600/20 text-green-600 dark:text-green-400 border-green-500/20 flex-grow-[2]' : 'bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border-black/5 dark:border-white/5 flex-grow'}`}>
+                    <span className="material-symbols-rounded text-sm">{sessionSavedId ? 'bookmark_added' : 'bookmark_add'}</span>
+                    {sessionSavedId ? 'Saved' : 'Save'}
+                  </button>
+                  <div className={`transition-all duration-500 ease-in-out flex items-center ${sessionSavedId ? 'w-14 opacity-100 scale-100' : 'w-0 opacity-0 scale-50 pointer-events-none'}`}>
+                    <button onClick={toggleFavorite} className={`size-14 rounded-2xl flex items-center justify-center ios-transition border-2 shrink-0 ${isFavorited ? 'bg-yellow-400 border-yellow-200 text-white shadow-[0_0_20px_rgba(250,204,21,0.4)]' : 'bg-black/5 dark:bg-[#2C2C2E] border-black/5 dark:border-white/20 text-apple-text dark:text-white hover:bg-yellow-400/10'}`}>
+                      <span className={`material-symbols-rounded text-[22px] leading-none transition-all duration-300 ${isFavorited ? 'fill-1 scale-125' : 'scale-100'}`}>star</span>
+                    </button>
+                  </div>
+                </div>
+                <button onClick={onReset} className="w-full bg-red-500/5 hover:bg-red-500/10 text-red-500 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-2 border border-red-500/10 mt-2">
+                  <span className="material-symbols-rounded text-sm">logout</span>
+                  {t.workout.exitBtn}
+                </button>
               </div>
             </div>
           </section>
-          
-          {!settings.isPro && (
-             <div onClick={onUpgrade} className="w-full p-6 rounded-[2rem] bg-gradient-to-br from-yellow-400 to-orange-500 text-black shadow-lg cursor-pointer hover:scale-[1.02] transition-transform animate-float">
-                <div className="flex items-center gap-4">
-                   <div className="size-10 bg-black/10 rounded-full flex items-center justify-center">
-                      <span className="material-symbols-rounded font-black">diamond</span>
-                   </div>
-                   <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Unlock Pro</span>
-                      <span className="text-sm font-black uppercase">Get High-Intensity Plans</span>
-                   </div>
-                   <span className="material-symbols-rounded ms-auto">arrow_forward_ios</span>
-                </div>
-             </div>
-          )}
+
 
           <button onClick={() => setShowDisclaimer(true)} className="w-full py-4 rounded-2xl border-2 border-dashed border-apple-gray/20 dark:border-white/10 text-apple-gray font-black text-[10px] uppercase tracking-widest hover:border-apple-blue/40 hover:text-apple-blue transition-colors">
             {t.workout.legalDisclaimerBtn}
@@ -612,10 +588,10 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowDisclaimer(false)}>
           <div className="bg-white dark:bg-[#1C1C1E] p-8 rounded-3xl shadow-2xl max-w-lg w-full space-y-6 animate-spring" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center">
-               <h4 className="text-sm font-black uppercase tracking-widest text-apple-text dark:text-white">{t.workout.legalModalTitle}</h4>
-               <button onClick={() => setShowDisclaimer(false)} className="size-8 rounded-full bg-apple-bg dark:bg-white/10 flex items-center justify-center text-apple-gray hover:text-apple-text">
-                  <span className="material-symbols-rounded">close</span>
-               </button>
+              <h4 className="text-sm font-black uppercase tracking-widest text-apple-text dark:text-white">{t.workout.legalModalTitle}</h4>
+              <button onClick={() => setShowDisclaimer(false)} className="size-8 rounded-full bg-apple-bg dark:bg-white/10 flex items-center justify-center text-apple-gray hover:text-apple-text">
+                <span className="material-symbols-rounded">close</span>
+              </button>
             </div>
             <div className="space-y-4 text-[12px] leading-relaxed text-apple-label dark:text-apple-gray font-medium">
               {t.workout.legalBody.map((p, i) => <p key={i}>{p}</p>)}
