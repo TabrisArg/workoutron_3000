@@ -4,7 +4,6 @@ import { WorkoutRoutine, Exercise, SavedWorkout, UserSettings } from '../types';
 import { compressBase64 } from '../utils/imageUtils';
 import { soundService } from '../utils/soundService';
 import { TranslationSchema } from '../i18n/types';
-import ShareStudio from './ShareStudio';
 import { isSimilarName } from '../utils/stringUtils';
 
 interface ExerciseWithId extends Exercise {
@@ -21,6 +20,7 @@ interface WorkoutRoutineDisplayProps {
   onComplete: (routine: WorkoutRoutine, savedId: string | null) => void;
   onUpgrade: () => void; // NEW: Callback for upgrade prompt
   onDuplicateDetected: (routine: WorkoutRoutine, image: string | null) => void;
+  onOpenShare: () => void;
 }
 
 const CONV = { KG_TO_LB: 2.20462, M_TO_YD: 1.09361, KM_TO_MI: 0.621371 };
@@ -167,7 +167,7 @@ const ActiveTrainingOverlay: React.FC<{
 
   if (status === 'finished') {
     return (
-      <div className="fixed inset-0 z-[200] bg-vizofit-accent flex flex-col items-center justify-center p-10 text-apple-text animate-reveal">
+      <div className="fixed inset-0 z-[200] bg-vizofit-accent flex flex-col items-center justify-center p-10 text-apple-text animate-pure-fade">
         <span className="material-symbols-rounded text-[120px] mb-6 animate-spring">celebration</span>
         <h2 className="text-4xl font-black tracking-tighter mb-2">{t.workout.complete}</h2>
         <p className="text-white/80 font-bold mb-10">You crushed it!</p>
@@ -183,7 +183,7 @@ const ActiveTrainingOverlay: React.FC<{
   const circleLabel = status === 'resting' ? t.workout.recovery : (hasUnitInReps ? t.workout.exerciseLabel : t.workout.reps);
 
   return (
-    <div className="fixed inset-0 z-[200] bg-white dark:bg-[#000000] flex flex-col animate-reveal">
+    <div className="fixed inset-0 z-[200] bg-white dark:bg-[#000000] flex flex-col animate-pure-fade">
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-apple-bg dark:bg-white/10">
         <div className="h-full bg-vizofit-accent transition-all duration-500" style={{ width: `${progress}%` }}></div>
       </div>
@@ -245,7 +245,7 @@ const ActiveTrainingOverlay: React.FC<{
           </div>
         </div>
         <div className="w-full max-w-md mx-auto pb-12">
-          <p className="text-apple-label dark:text-apple-gray/80 text-sm font-medium leading-relaxed break-words px-4">{currentExercise.instructions}</p>
+          <p className="text-apple-label dark:text-white/70 text-sm font-medium leading-relaxed break-words px-4">{currentExercise.instructions}</p>
         </div>
       </main>
     </div>
@@ -273,7 +273,7 @@ const IntensityGauge: React.FC<{ activeId: number, isPro: boolean, onChange: (id
   );
 };
 
-const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, imagePreview, initialSavedId, settings, t, onReset, onComplete, onUpgrade, onDuplicateDetected }) => {
+const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, imagePreview, initialSavedId, settings, t, onReset, onComplete, onUpgrade, onDuplicateDetected, onOpenShare }) => {
   const prepareRoutine = (r: WorkoutRoutine) => ({
     ...r,
     exercises: r.exercises.map((ex, i) => ({ ...ex, id: `ex-${i}-${Date.now()}` } as ExerciseWithId))
@@ -284,7 +284,6 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
   const [sessionSavedId, setSessionSavedId] = useState<string | null>(initialSavedId);
   const [isFavorited, setIsFavorited] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
-  const [showShareStudio, setShowShareStudio] = useState(false);
   const [isActiveMode, setIsActiveMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
@@ -414,7 +413,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
   const isLanguageMismatch = baselineRoutine.generatedLanguage && baselineRoutine.generatedLanguage !== settings.language;
 
   return (
-    <div className="space-y-8 pb-64 w-full max-w-6xl mx-auto px-4 relative">
+    <div className="space-y-8 pb-64 w-full max-w-6xl mx-auto px-4">
       <style>{`
         body.reordering-active { cursor: grabbing !important; user-select: none !important; }
         body.reordering-active * { cursor: grabbing !important; pointer-events: auto !important; }
@@ -424,9 +423,6 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
         <ActiveTrainingOverlay exercises={currentRoutine.exercises} units={settings.units} t={t} onClose={() => setIsActiveMode(false)} onComplete={finalizeWorkout} />
       )}
 
-      {showShareStudio && (
-        <ShareStudio routine={currentRoutine as unknown as WorkoutRoutine} imagePreview={imagePreview} t={t} settings={settings} onClose={() => setShowShareStudio(false)} />
-      )}
 
       <div className="relative aspect-[16/10] md:aspect-[21/9] rounded-ios-lg overflow-hidden shadow-ios animate-reveal">
         <img src={imagePreview || ''} className="w-full h-full object-cover" alt="Equip" />
@@ -501,7 +497,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                   {isEditing ? (
                     <textarea value={ex.instructions} onChange={(e) => updateExercise(idx, 'instructions', e.target.value)} className="w-full bg-apple-bg dark:bg-[#2C2C2E] border-2 border-black/[0.05] dark:border-white/10 rounded-2xl px-4 py-3 text-sm font-medium dark:text-apple-gray focus:outline-none focus:border-vizofit-accent/50 focus:ring-4 focus:ring-vizofit-accent/10 ios-transition min-h-[100px] leading-relaxed" />
                   ) : (
-                    <p className="text-sm font-medium text-apple-label dark:text-apple-gray/80 leading-relaxed ps-9 break-words">{ex.instructions}</p>
+                    <p className="text-sm font-medium text-apple-label dark:text-white/70 leading-relaxed ps-9 break-words">{ex.instructions}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-1 gap-3 shrink-0 md:w-36">
@@ -513,7 +509,14 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                       <span className="text-2xl font-black text-apple-text dark:text-white tracking-tighter uppercase">{formatSmartDisplay(ex.sets, settings.units)}</span>
                     )}
                   </div>
-                  <span className="text-2xl font-black text-apple-text dark:text-vizofit-accent tracking-tighter uppercase">{formatSmartDisplay(ex.reps, settings.units)}</span>
+                  <div className={`p-4 rounded-[2rem] flex flex-col items-center justify-center text-center ${isEditing ? 'bg-vizofit-accent text-apple-text shadow-lg' : 'bg-vizofit-accent shadow-ios'} scale-105 z-10`}>
+                    <span className={`text-[8px] font-black ${isEditing ? 'text-apple-text/60' : 'text-apple-text/80'} uppercase tracking-widest mb-1`}>{t.workout.reps}</span>
+                    {isEditing ? (
+                      <input type="text" value={ex.reps} onChange={(e) => updateExercise(idx, 'reps', e.target.value)} className="w-full bg-transparent text-center text-xl font-black text-apple-text focus:outline-none placeholder:text-apple-text/30 p-0 border-none ring-0 shadow-none focus:ring-0 focus:border-none" placeholder="Reps" />
+                    ) : (
+                      <span className="text-2xl font-black text-apple-text tracking-tighter uppercase">{formatSmartDisplay(ex.reps, settings.units)}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -556,7 +559,7 @@ const WorkoutRoutineDisplay: React.FC<WorkoutRoutineDisplayProps> = ({ routine, 
                     <span className="material-symbols-rounded text-sm">{isEditing ? 'check_circle' : 'edit'}</span>
                     {isEditing ? 'Save' : 'Edit'}
                   </button>
-                  <button onClick={() => { soundService.playTap(); setShowShareStudio(true); }} className="py-4 rounded-2xl bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border border-black/5 dark:border-white/5 font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-3 active:scale-95 group transition-all">
+                  <button onClick={() => { soundService.playTap(); onOpenShare(); }} className="py-4 rounded-2xl bg-black/5 dark:bg-[#2C2C2E] hover:bg-black/10 dark:hover:bg-[#3A3A3C] text-apple-text dark:text-white border border-black/5 dark:border-white/5 font-black text-[10px] uppercase tracking-widest ios-transition flex items-center justify-center gap-3 active:scale-95 group transition-all">
                     <span className="material-symbols-rounded text-lg group-hover:scale-110 transition-transform leading-none">share</span>
                     <div className="flex flex-col items-start leading-[1.1]">
                       {t.workout.shareBtn.split(' ').map((word, i) => <span key={i} className="block">{word}</span>)}

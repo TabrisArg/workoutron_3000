@@ -28,15 +28,24 @@ export const analyzeEquipment = async (
     OUTPUT LANGUAGE: ${langName}
     UNITS: ${unitInstructions}
 
+    CRITICAL: Look VERY carefully at the image. Even if the photo is blurry or unclear:
+    - Try to identify ANY visible equipment, objects, or tools that could be used for exercise
+    - If you see dumbbells, barbells, kettlebells, machines, bands, or ANY fitness equipment, you MUST use them
+    - Make educated guesses about equipment type and weights based on visual cues
+    - Default to "Bodyweight" ONLY as an absolute last resort when NO equipment is visible at all
+
     EXERCISE RULES:
     - CONCRETE weights (e.g. "10kg", "15lbs"). No "light/medium".
-    - Use "Bodyweight" if no equipment load.
-    - If a person/pet/child is shown, design "Interactive Play" or "Bodyweight Resistance".
+    - ONLY use "Bodyweight" if the image shows ZERO equipment - just a person, empty space, or non-fitness objects.
+    - If ANY equipment is visible (dumbbells, barbells, kettlebells, machines, resistance bands, benches, etc.), you MUST specify concrete weight values.
+    - For adjustable equipment (dumbbells, barbells), suggest appropriate starting weights based on the equipment type and typical usage.
+    - If unclear what equipment it is, make your best guess based on shape, size, and context.
+    - If a person/pet/child is shown WITHOUT any fitness equipment, design "Interactive Play" or "Bodyweight Resistance".
     - MUST GENERATE BETWEEN 4 and 6 exercises. Never more than 6, never less than 4.
     - Format: Names/Instructions must be in ${langName}.
 
     SCHEMA REQUIREMENTS:
-    - equipmentName: Common name of gear.
+    - equipmentName: Common name of gear (be specific - "20kg Dumbbells" not just "Dumbbells").
     - exercises: Array of 4-6 exercises using ONLY this gear.
     - safetyTips: 3-4 critical safety points.
     - estimatedDuration: Total time (e.g., "25 min").
@@ -94,6 +103,7 @@ export const analyzeEquipment = async (
 
     const result = JSON.parse(text) as WorkoutRoutine;
     result.generatedLanguage = language;
+    result.debugRawResponse = text; // Store raw response for debug menu
     return result;
   } catch (error: any) {
     console.error("AI Analysis Detailed Error:", error);

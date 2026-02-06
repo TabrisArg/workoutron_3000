@@ -108,7 +108,7 @@ const ShareStudio: React.FC<ShareStudioProps> = ({ routine, imagePreview, t, set
 
     // Draw VizoFit Logo and Name in Top Right corner
     const logoImg = new Image();
-    logoImg.src = 'assets/Branding/SVG/Corol_logo_Icon.svg';
+    logoImg.src = 'assets/Branding/SVG/Full_logo_Icon.svg';
     await new Promise(res => { logoImg.onload = res; logoImg.onerror = res; });
 
     const brandName = "VIZOFIT";
@@ -305,7 +305,7 @@ const ShareStudio: React.FC<ShareStudioProps> = ({ routine, imagePreview, t, set
   ];
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+    <div className="fixed inset-0 w-screen h-screen left-0 top-0 z-[2000] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-4 md:p-8 animate-pure-fade">
       {copyStatus && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 bg-vizofit-accent text-apple-text px-8 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl z-[3000] animate-spring flex items-center gap-4 border border-white/20">
           <span className="material-symbols-rounded animate-bounce">content_paste</span>
@@ -346,10 +346,10 @@ const ShareStudio: React.FC<ShareStudioProps> = ({ routine, imagePreview, t, set
                 onClick={() => handleAction(p.id, p.label)}
                 className={`flex flex-col items-center justify-center gap-2 p-4 rounded-3xl ios-transition active:scale-90 hover:opacity-90 transition-all ${p.color} text-white group shadow-lg`}
               >
-                <div className="size-10 flex items-center justify-center p-0.5 group-hover:scale-110 transition-transform">
-                  <img src={p.svg} className="w-full h-full object-contain" alt={p.label} />
+                <div className="size-10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <img src={p.svg} className={`w-full h-full object-contain ${p.id === 'snapchat' ? 'scale-[1.2]' : 'p-1'}`} alt={p.label} />
                 </div>
-                <span className="text-[9px] font-black uppercase tracking-tighter opacity-80 group-hover:opacity-100 dark:text-white/70">{p.label}</span>
+                <span className="text-xs font-black uppercase tracking-wide py-1 drop-shadow-md opacity-100">{p.label}</span>
               </button>
             ))}
           </div>

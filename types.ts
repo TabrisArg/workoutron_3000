@@ -17,6 +17,7 @@ export interface WorkoutRoutine {
   estimatedDuration: string;
   suggestedIntensity?: string;
   generatedLanguage?: string;
+  debugRawResponse?: string; // For debug menu
 }
 
 export interface SavedWorkout {

@@ -144,8 +144,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, isLoadin
           </div>
         ) : (
           <button onClick={startCamera} className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center ios-transition hover:bg-apple-bg/30 dark:hover:bg-white/5 active:scale-[0.98] group">
-            <div className="size-24 rounded-full bg-white dark:bg-[#2C2C2E] flex items-center justify-center mb-6 border border-black/[0.02] dark:border-white/10 shadow-sm group-hover:scale-105 ios-transition">
-              <span className="material-symbols-rounded text-6xl text-vizofit-accent font-light">camera</span>
+            <div className="relative size-28 flex items-center justify-center mb-8">
+              {/* Dynamic Aura Glow */}
+              <div className="absolute inset-0 bg-vizofit-accent/20 dark:bg-vizofit-accent/10 blur-[40px] rounded-full scale-150 group-hover:scale-[1.8] ios-transition duration-700 opacity-60 dark:opacity-40 animate-pulse-soft" />
+
+              {/* Frosted Glass Disc */}
+              <div className="size-24 rounded-full relative flex items-center justify-center overflow-hidden border border-white/50 dark:border-white/10 shadow-2xl group-hover:scale-110 ios-transition bg-white/30 dark:bg-white/5 backdrop-blur-2xl">
+                {/* Brand Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-vizofit-accent/40 via-transparent to-vizofit-accent/10 dark:from-vizofit-accent/20 dark:to-transparent" />
+
+                {/* Noise Texture for 'Frosted' feel */}
+                <div className="absolute inset-0 opacity-[0.07] pointer-events-none mix-blend-overlay"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")` }}
+                />
+
+                <img src="assets/Icons/snap_icon.png" className="size-14 object-contain relative z-20 drop-shadow-[0_8px_15px_rgba(0,0,0,0.2)]" alt="Snap" />
+              </div>
             </div>
             <h3 className="text-2xl font-black tracking-tight mb-2 text-apple-text dark:text-white">{t.uploader.snapTitle}</h3>
             <p className="text-apple-gray font-bold text-sm px-4">{t.uploader.snapDesc}</p>

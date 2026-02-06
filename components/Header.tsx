@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ view, onNavigate, settings, t }) => {
     <div className="px-6 py-4 flex items-center justify-between sticky top-0 z-[100] bg-apple-bg/80 dark:bg-black/80 backdrop-blur-md border-b border-black/[0.03] dark:border-white/10">
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('analyzer')}>
         <div className="size-10 rounded-xl bg-white flex items-center justify-center shadow-ios border border-black/5 overflow-hidden">
-          <img src="assets/Branding/SVG/Corol_logo_Icon.svg" className="w-full h-full object-cover p-1" alt="Logo" />
+          <img src="assets/Branding/SVG/Full_logo_Icon.svg" className="w-full h-full object-cover p-1" alt="Logo" />
         </div>
         <div className="flex flex-col -space-y-1">
           <span className="font-black text-sm tracking-tight text-apple-text dark:text-white uppercase">{t.common.appName}</span>

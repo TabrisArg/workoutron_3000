@@ -3,9 +3,11 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import ImageUploader from './components/ImageUploader';
 import WorkoutRoutineDisplay from './components/WorkoutRoutineDisplay';
+import ShareStudio from './components/ShareStudio';
 import SavedWorkouts from './components/SavedWorkouts';
 import ActivityCalendar from './components/ActivityCalendar';
 import Settings from './components/Settings';
+import DebugMenu from './components/DebugMenu';
 import { analyzeEquipment } from './services/geminiService';
 import { WorkoutRoutine, AppStatus, SavedWorkout, UserSettings } from './types';
 import { compressBase64 } from './utils/imageUtils';
@@ -65,6 +67,7 @@ const App: React.FC = () => {
   const [showConflictModal, setShowConflictModal] = useState(false);
   const [pendingRoutine, setPendingRoutine] = useState<{ routine: WorkoutRoutine, image: string } | null>(null);
   const [showLegalLanding, setShowLegalLanding] = useState(false);
+  const [showShareStudio, setShowShareStudio] = useState(false);
 
   useEffect(() => {
     const applyAppearance = () => {
@@ -173,11 +176,11 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className={`min-h-screen flex flex-col bg-apple-bg dark:bg-[#000000] overflow-x-hidden relative ${settings.language === 'ar' ? 'font-sans' : ''}`}>
+      <div className={`min-h-screen flex flex-col bg-apple-bg dark:bg-[#000000] overflow-x-hidden ${settings.language === 'ar' ? 'font-sans' : ''}`}>
         <div className="w-full max-w-6xl mx-auto flex flex-col flex-grow">
           <Header view={view} onNavigate={handleNav} settings={settings} t={t} />
-          <main className="flex-grow px-5 pb-32 pt-6 overflow-y-auto">
-            <div key={view} className="animate-reveal h-full">
+          <main className="flex-grow px-5 pb-32 pt-6">
+            <div key={view} className="h-full">
               {view === 'library' ? (
                 <SavedWorkouts t={t} onSelect={(w) => { soundService.playTap(); setRoutine(w.routine); setImagePreview(w.imagePreview); setActiveWorkoutId(w.id); setView('analyzer'); setStatus(AppStatus.SUCCESS); }} />
               ) : view === 'activity' ? (
@@ -211,7 +214,7 @@ const App: React.FC = () => {
                       )}
                     </div>
                   ) : (
-                    routine && <WorkoutRoutineDisplay routine={routine} imagePreview={imagePreview} initialSavedId={activeWorkoutId} settings={settings} t={t} onReset={() => { soundService.playCancel(); resetApp(); }} onComplete={handleWorkoutComplete} onUpgrade={() => { }} onDuplicateDetected={(r, img) => { setPendingRoutine({ routine: r, image: img || '' }); setShowConflictModal(true); }} />
+                    routine && <WorkoutRoutineDisplay routine={routine} imagePreview={imagePreview} initialSavedId={activeWorkoutId} settings={settings} t={t} onReset={() => { soundService.playCancel(); resetApp(); }} onComplete={handleWorkoutComplete} onUpgrade={() => { }} onDuplicateDetected={(r, img) => { setPendingRoutine({ routine: r, image: img || '' }); setShowConflictModal(true); }} onOpenShare={() => setShowShareStudio(true)} />
                   )}
                 </div>
               )}
@@ -274,6 +277,13 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      {showShareStudio && routine && (
+        <ShareStudio routine={routine} imagePreview={imagePreview} t={t} settings={settings} onClose={() => setShowShareStudio(false)} />
+      )}
+
+      {/* Debug Menu - Toggle with 'D' key */}
+      <DebugMenu routine={routine} />
     </>
   );
 };
